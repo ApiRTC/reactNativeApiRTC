@@ -49,8 +49,8 @@ Option in application sample :
 
 ## Demo Usage
 
-Start application on your mobile, and connect to a room
-Then you can open [apiRTC Conference demo](https://apirtc.github.io/ApiRTC-examples/conferencing/index.html) in the browser of your computer, on connect to the same room.
+Start application on your mobile, and connect to a room.
+Then you can open [apiRTC Conference demo](https://apirtc.github.io/ApiRTC-examples/conferencing/index.html) in the browser of your computer, and connect to the same room.
 
 ## FAQ
 
