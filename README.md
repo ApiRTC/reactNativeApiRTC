@@ -17,11 +17,11 @@ You can check documentation :
 
 ### iOS
 - install Xcode and command line tools
-- run `pod update` from ios folder
-- run `npx react-native run-ios` or run project from Xcode workspace
+- run `pod update` from ios folder (cd ios)
+- run `npm run ios` or run project from Xcode workspace
 
 ### Android:
-- run `react-native run-android` or run project from Android Studio
+- run `npm run android` or run project from Android Studio
 	
 ## ApiRTC key
 For this demo we use the ApiKey "myDemoApiKey". Please register on our website to get [your own private ApiKey](https://cloud.apizee.com/register)
@@ -50,9 +50,12 @@ Option in application sample :
 ## Demo Usage
 
 Start application on your mobile, and connect to a room
-Then you can open [apiRTc Conference demo](https://apirtc.github.io/ApiRTC-examples/conferencing/index.html) in the browser of your computer, on connect to the same room.
+Then you can open [apiRTC Conference demo](https://apirtc.github.io/ApiRTC-examples/conferencing/index.html) in the browser of your computer, on connect to the same room.
 
 ## FAQ
+
+### Requirements
+* React Native needs Node.js >= 16 (Check [NVM](https://github.com/nvm-sh/nvm) if needed)
 
 ### What are the authorizations that are need to be declared on application
 
@@ -83,3 +86,15 @@ For iOS, edit your Info.plist file by adding :
 <key>NSMicrophoneUsageDescription</key>
 <string>Microphone permission description</string>
 ```
+
+### Android SDK
+
+Make sure that you have set ANDROID_HOME value
+
+Sample for mac :
+nano ~/.bash_profile
+add following lines in bash_profile file
+    export ANDROID_HOME=/Users/fred/Library/Android/sdk/
+    export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
+source ~/.bash_profile
+echo $ANDROID_HOME

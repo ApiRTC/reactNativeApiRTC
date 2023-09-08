@@ -732,7 +732,7 @@ SPEC CHECKSUMS:
   React-runtimescheduler: 4941cc1b3cf08b792fbf666342c9fc95f1969035
   React-utils: b79f2411931f9d3ea5781404dcbb2fa8a837e13a
   ReactCommon: 4b2bdcb50a3543e1c2b2849ad44533686610826d
-  RNDeviceInfo: 02ea8b23e2280fa18e00a06d7e62804d74028579
+  RNDeviceInfo: c847eaf65daac092829f36b7eac5e31d3d6fa81c
   RNNotifee: f3c01b391dd8e98e67f539f9a35a9cbcd3bae744
   RNSVG: ed492aaf3af9ca01bc945f7a149d76d62e73ec82
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
