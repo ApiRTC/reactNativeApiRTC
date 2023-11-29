@@ -13,7 +13,9 @@ import {
 
 import ReactNativeApiRTC from './ReactNativeApiRTC';
 
-import {setStatusBarBackgroundColor} from 'expo-status-bar';
+import LogRocket from '@logrocket/react-native';
+
+import { setStatusBarBackgroundColor } from 'expo-status-bar';
 
 const styles = StyleSheet.create({
   container: {
@@ -62,7 +64,14 @@ export default class MenuReactApiRTC extends React.Component {
     this.state = initialState;
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    LogRocket.init('jof0xj/exampletest')
+
+    LogRocket.identify('Savinien', {
+      name: 'Savinien Barbotaud',
+      email: 'savinien.barbotaud@apizee.com',
+    });
+  }
 
   changeMode(mode, value) {
     if (mode === 'confMode') {
@@ -71,7 +80,7 @@ export default class MenuReactApiRTC extends React.Component {
       } else {
         setStatusBarBackgroundColor('blue');
       }
-      this.setState({confMode: value});
+      this.setState({ confMode: value });
     }
   }
 
@@ -88,7 +97,7 @@ export default class MenuReactApiRTC extends React.Component {
         return null;
       }
       return (
-        <View style={{marginTop: 250, paddingHorizontal: 100}}>
+        <View style={{ marginTop: 250, paddingHorizontal: 100 }}>
           <Text>Welcome, select the demo :</Text>
           <Pressable
             style={styles.button}

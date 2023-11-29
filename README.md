@@ -98,3 +98,9 @@ add following lines in bash_profile file
     export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
 source ~/.bash_profile
 echo $ANDROID_HOME
+
+### LogRocket configuration
+
+``` adb reverse tcp:8081 tcp:8081 ```
+
+

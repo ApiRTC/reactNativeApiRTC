@@ -19,3 +19,13 @@ buildscript {
         classpath("com.facebook.react:react-native-gradle-plugin")
     }
 }
+allprojects {
+    repositories {
+        maven {
+            url "$rootDir/../node_modules/@notifee/react-native/android/libs"
+        }
+        maven {
+            url "https://storage.googleapis.com/logrocket-maven/"
+        }
+    }
+}

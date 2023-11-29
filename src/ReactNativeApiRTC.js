@@ -163,7 +163,7 @@ export default class ReactNativeApiRTC extends React.Component {
 
   setListeners() {
     this.conversation.on('contactJoined', newContact => {
-      console.info('REACT - Contact list change');
+      console.info('Contact list change');
       let array_contact = this.state.connectedUsersList;
       array_contact.push(newContact.getUsername);
       this.setState({connectedUsersList: array_contact});
