@@ -28,11 +28,11 @@ For this demo we use the ApiKey "myDemoApiKey". Please register on our website t
 
 ## Installation
 
-```npm i @apirtc/apirtc --save```
+```npm i @apirtc/react-native-apirtc --save```
 
 or 
 
-```yarn add @apirtc/apirtc```
+```yarn add @apirtc/react-native-apirtc```
 
 ## Supported Features
 Here is the list of supported feature depending on mobile OS
