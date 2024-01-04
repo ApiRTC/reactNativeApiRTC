@@ -26,14 +26,6 @@ You can check documentation :
 ## ApiRTC key
 For this demo we use the ApiKey "myDemoApiKey". Please register on our website to get [your own private ApiKey](https://cloud.apizee.com/register)
 
-## Installation
-
-```npm i @apirtc/react-native-apirtc --save```
-
-or 
-
-```yarn add @apirtc/react-native-apirtc```
-
 ## Supported Features
 Here is the list of supported feature depending on mobile OS
 
