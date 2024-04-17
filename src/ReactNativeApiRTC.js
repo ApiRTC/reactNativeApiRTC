@@ -683,7 +683,7 @@ export default class ReactNativeApiRTC extends React.Component {
             }}>
             <View style={styles.svgButton}>{renderMuteVideoButton(ctx)}</View>
           </TouchableOpacity>
-          {dipslayScreenShare(ctx)}
+          {displayScreenShare(ctx)}
           <TouchableOpacity
             style={styles.renderButtonComponent}
             onPress={() => {
@@ -706,7 +706,7 @@ export default class ReactNativeApiRTC extends React.Component {
       );
     }
 
-    function dipslayScreenShare(ctx) {
+    function displayScreenShare(ctx) {
       if (Platform.OS === 'ios') {
         return null;
       }
