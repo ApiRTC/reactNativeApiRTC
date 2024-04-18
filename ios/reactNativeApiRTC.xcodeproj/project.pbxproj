@@ -14,6 +14,9 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		7699B88040F8A987B510C191 /* libPods-reactNativeApiRTC-reactNativeApiRTCTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-reactNativeApiRTC-reactNativeApiRTCTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		B6A74E892BCFCC650010DC42 /* ReplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6A74E882BCFCC650010DC42 /* ReplayKit.framework */; };
+		B6A74E8C2BCFCC650010DC42 /* SampleHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A74E8B2BCFCC650010DC42 /* SampleHandler.swift */; };
+		B6A74E902BCFCC650010DC42 /* screenSharing_Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B6A74E872BCFCC650010DC42 /* screenSharing_Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -24,7 +27,28 @@
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
 			remoteInfo = reactNativeApiRTC;
 		};
+		B6A74E8E2BCFCC650010DC42 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B6A74E862BCFCC650010DC42;
+			remoteInfo = screenSharing_Extension;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B6A74E912BCFCC650010DC42 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				B6A74E902BCFCC650010DC42 /* screenSharing_Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		00E356EE1AD99517003FC87E /* reactNativeApiRTCTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = reactNativeApiRTCTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -43,6 +67,12 @@
 		5DCACB8F33CDC322A6C60F78 /* libPods-reactNativeApiRTC.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-reactNativeApiRTC.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = reactNativeApiRTC/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-reactNativeApiRTC-reactNativeApiRTCTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-reactNativeApiRTC-reactNativeApiRTCTests.release.xcconfig"; path = "Target Support Files/Pods-reactNativeApiRTC-reactNativeApiRTCTests/Pods-reactNativeApiRTC-reactNativeApiRTCTests.release.xcconfig"; sourceTree = "<group>"; };
+		B6A74E872BCFCC650010DC42 /* screenSharing_Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = screenSharing_Extension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B6A74E882BCFCC650010DC42 /* ReplayKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ReplayKit.framework; path = System/Library/Frameworks/ReplayKit.framework; sourceTree = SDKROOT; };
+		B6A74E8B2BCFCC650010DC42 /* SampleHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleHandler.swift; sourceTree = "<group>"; };
+		B6A74E8D2BCFCC650010DC42 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B6A74E952BCFF3220010DC42 /* reactNativeApiRTC.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = reactNativeApiRTC.entitlements; path = reactNativeApiRTC/reactNativeApiRTC.entitlements; sourceTree = "<group>"; };
+		B6A74E962BCFF3540010DC42 /* screenSharing_Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = screenSharing_Extension.entitlements; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -60,6 +90,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C80B921A6F3F58F76C31292 /* libPods-reactNativeApiRTC.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B6A74E842BCFCC650010DC42 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B6A74E892BCFCC650010DC42 /* ReplayKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,6 +124,7 @@
 		13B07FAE1A68108700A75B9A /* reactNativeApiRTC */ = {
 			isa = PBXGroup;
 			children = (
+				B6A74E952BCFF3220010DC42 /* reactNativeApiRTC.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -102,6 +141,7 @@
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				5DCACB8F33CDC322A6C60F78 /* libPods-reactNativeApiRTC.a */,
 				19F6CBCC0A4E27FBF8BF4A61 /* libPods-reactNativeApiRTC-reactNativeApiRTCTests.a */,
+				B6A74E882BCFCC650010DC42 /* ReplayKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -119,6 +159,7 @@
 				13B07FAE1A68108700A75B9A /* reactNativeApiRTC */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* reactNativeApiRTCTests */,
+				B6A74E8A2BCFCC650010DC42 /* screenSharing_Extension */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
@@ -133,8 +174,19 @@
 			children = (
 				13B07F961A680F5B00A75B9A /* reactNativeApiRTC.app */,
 				00E356EE1AD99517003FC87E /* reactNativeApiRTCTests.xctest */,
+				B6A74E872BCFCC650010DC42 /* screenSharing_Extension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		B6A74E8A2BCFCC650010DC42 /* screenSharing_Extension */ = {
+			isa = PBXGroup;
+			children = (
+				B6A74E962BCFF3540010DC42 /* screenSharing_Extension.entitlements */,
+				B6A74E8B2BCFCC650010DC42 /* SampleHandler.swift */,
+				B6A74E8D2BCFCC650010DC42 /* Info.plist */,
+			);
+			path = screenSharing_Extension;
 			sourceTree = "<group>";
 		};
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
@@ -184,15 +236,34 @@
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */,
 				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
+				B6A74E912BCFCC650010DC42 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				B6A74E8F2BCFCC650010DC42 /* PBXTargetDependency */,
 			);
 			name = reactNativeApiRTC;
 			productName = reactNativeApiRTC;
 			productReference = 13B07F961A680F5B00A75B9A /* reactNativeApiRTC.app */;
 			productType = "com.apple.product-type.application";
+		};
+		B6A74E862BCFCC650010DC42 /* screenSharing_Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B6A74E942BCFCC650010DC42 /* Build configuration list for PBXNativeTarget "screenSharing_Extension" */;
+			buildPhases = (
+				B6A74E832BCFCC650010DC42 /* Sources */,
+				B6A74E842BCFCC650010DC42 /* Frameworks */,
+				B6A74E852BCFCC650010DC42 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = screenSharing_Extension;
+			productName = screenSharing_Extension;
+			productReference = B6A74E872BCFCC650010DC42 /* screenSharing_Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -200,6 +271,7 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 1530;
 				LastUpgradeCheck = 1210;
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
@@ -208,6 +280,9 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						LastSwiftMigration = 1120;
+					};
+					B6A74E862BCFCC650010DC42 = {
+						CreatedOnToolsVersion = 15.3;
 					};
 				};
 			};
@@ -226,6 +301,7 @@
 			targets = (
 				13B07F861A680F5B00A75B9A /* reactNativeApiRTC */,
 				00E356ED1AD99517003FC87E /* reactNativeApiRTCTests */,
+				B6A74E862BCFCC650010DC42 /* screenSharing_Extension */,
 			);
 		};
 /* End PBXProject section */
@@ -244,6 +320,13 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B6A74E852BCFCC650010DC42 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -417,6 +500,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B6A74E832BCFCC650010DC42 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B6A74E8C2BCFCC650010DC42 /* SampleHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -424,6 +515,11 @@
 			isa = PBXTargetDependency;
 			target = 13B07F861A680F5B00A75B9A /* reactNativeApiRTC */;
 			targetProxy = 00E356F41AD99517003FC87E /* PBXContainerItemProxy */;
+		};
+		B6A74E8F2BCFCC650010DC42 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B6A74E862BCFCC650010DC42 /* screenSharing_Extension */;
+			targetProxy = B6A74E8E2BCFCC650010DC42 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -433,6 +529,7 @@
 			baseConfigurationReference = 5B7EB9410499542E8C5724F5 /* Pods-reactNativeApiRTC-reactNativeApiRTCTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = BLK87S84CQ;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -461,6 +558,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = BLK87S84CQ;
 				INFOPLIST_FILE = reactNativeApiRTCTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -483,8 +581,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3B4392A12AC88292D35C810B /* Pods-reactNativeApiRTC.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = reactNativeApiRTC/reactNativeApiRTC.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = BLK87S84CQ;
 				ENABLE_BITCODE = NO;
@@ -514,8 +614,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5709B34CF0A7D63546082F79 /* Pods-reactNativeApiRTC.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = reactNativeApiRTC/reactNativeApiRTC.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = BLK87S84CQ;
 				INFOPLIST_FILE = reactNativeApiRTC/Info.plist;
@@ -678,6 +780,89 @@
 			};
 			name = Release;
 		};
+		B6A74E922BCFCC650010DC42 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = screenSharing_Extension/screenSharing_Extension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = BLK87S84CQ;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = screenSharing_Extension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = screenSharing_Extension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.reactNativeApiRTC.screenSharing-Extension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B6A74E932BCFCC650010DC42 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = screenSharing_Extension/screenSharing_Extension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = BLK87S84CQ;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = screenSharing_Extension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = screenSharing_Extension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.reactNativeApiRTC.screenSharing-Extension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -704,6 +889,15 @@
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,
 				83CBBA211A601CBA00E9B192 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B6A74E942BCFCC650010DC42 /* Build configuration list for PBXNativeTarget "screenSharing_Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B6A74E922BCFCC650010DC42 /* Debug */,
+				B6A74E932BCFCC650010DC42 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 /* globals apiRTC*/
 
-import React from 'react';
+import React, {createRef}  from 'react';
 import {
   Text,
   View,
@@ -11,6 +11,8 @@ import {
   Pressable,
   TouchableOpacity,
   Platform,
+  findNodeHandle,
+  NativeModules,
 } from 'react-native';
 
 import {
@@ -96,6 +98,8 @@ export default class ReactNativeApiRTC extends React.Component {
       this.foreground = new ForegroundService();
     }
     this.screenSharingIsStarted = false; //Boolean to know if screen sharing is started
+    this.localStreamIsPublished = false; //Boolean to know if local stream is published
+    this.localScreenIsPublished = false; //Boolean to know if local screen is published
   }
 
   componentDidMount() {
@@ -123,11 +127,9 @@ export default class ReactNativeApiRTC extends React.Component {
     /*
     Screen sharing is not yet available on iOS
     */
-    /*
     if (Platform.OS === 'ios') {
       this.screenCaptureView = createRef(null);
     }
-    */
   }
 
   joinConversation() {
@@ -144,6 +146,7 @@ export default class ReactNativeApiRTC extends React.Component {
             this.conversation
               .publish(localStream)
               .then(pubStream => {
+                this.localStreamIsPublished = true;
                 this.setState({selfViewSrc: localStream.getData().toURL()});
               })
               .catch(err => {
@@ -263,11 +266,13 @@ export default class ReactNativeApiRTC extends React.Component {
   };
 
   hangUp = () => {
-    if (this.localStream) {
+    if (this.localStream && this.localStreamIsPublished) {
       this.conversation.unpublish(this.localStream);
+      this.localStreamIsPublished = false;
     }
-    if (this.localScreen) {
+    if (this.localScreen && this.localScreenIsPublished) {
       this.conversation.unpublish(this.localScreen);
+      this.localScreenIsPublished = false;
     }
     this.localScreen = null;
     this.localStream = null;
@@ -294,8 +299,9 @@ export default class ReactNativeApiRTC extends React.Component {
       this.setState({switch_screenShare: false});
       this.setState({screenUserValidated: false});
       this.setState({screenDisableUserValidated: false});
-      if (this.localScreen) {
+      if (this.localScreen && this.localScreenIsPublished) {
         this.conversation.unpublish(this.localScreen);
+        this.localScreenIsPublished = false;
       }
       this.localScreen = null;
       this.screenSharingIsStarted = false;
@@ -305,7 +311,6 @@ export default class ReactNativeApiRTC extends React.Component {
         /*
         Screen sharing is not yet available on iOS
         */
-        /*
         const reactTag = findNodeHandle(this.screenCaptureView.current);
         NativeModules.ScreenCapturePickerViewManager.show(reactTag);
 
@@ -318,6 +323,8 @@ export default class ReactNativeApiRTC extends React.Component {
             this.screenSharingIsStarted = true;
             this.localScreen = localScreenShare;
             this.setState({selfScreenSrc: this.localScreen.getData().toURL()});
+            /*
+
             this.conversation
               .publish(localScreenShare)
               .then(publishedScreenShare => {
@@ -326,11 +333,11 @@ export default class ReactNativeApiRTC extends React.Component {
               .catch(err => {
                 console.error(err);
               });
+            */
           })
           .catch(err => {
             console.error(err);
           });
-        */
       } else {
         this.foreground.startService(
           'Screen sharing',

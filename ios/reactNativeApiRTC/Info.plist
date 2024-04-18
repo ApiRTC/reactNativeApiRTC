@@ -41,6 +41,18 @@
 	<string>Local network travel.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Microphone permission description</string>
+	<key>RTCAppGroupIdentifier</key>
+	<string>group.apirtc.reactNativeApiRTC.broadcast</string>
+	<key>RTCScreenSharingExtension</key>
+	<string>org.reactjs.native.example.reactNativeApiRTC.screenSharing-Extension</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+		<string>fetch</string>
+		<string>processing</string>
+		<string>remote-notification</string>
+		<string>voip</string>
+	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>UILaunchStoryboardName</key>
