@@ -93,8 +93,12 @@ Make sure that you have set ANDROID_HOME value
 
 Sample for mac :
 nano ~/.bash_profile
-add following lines in bash_profile file
+add following lines in bash_profile file:
+
     export ANDROID_HOME=/Users/fred/Library/Android/sdk/
+
     export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
-source ~/.bash_profile
-echo $ANDROID_HOME
+
+source ~/.bash_profile //To apply modifications
+
+echo $ANDROID_HOME //To check modifications

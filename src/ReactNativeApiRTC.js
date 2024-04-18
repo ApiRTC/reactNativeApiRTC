@@ -27,8 +27,6 @@ import {
 import DeviceInfo from 'react-native-device-info';
 
 import '@apirtc/react-native-apirtc';
-//import apiCC from '@apirtc/apirtc';
-//import apiRTC from '@apirtc/apirtc';
 
 import ForegroundService from './ForegroundService';
 import Chat_apiRTC from './Chat_apiRTC';
@@ -93,10 +91,11 @@ export default class ReactNativeApiRTC extends React.Component {
     this.conversation = null;
     this.localStream = null;
     this.localScreen = null;
-    this.publishedLocalStream = null;
-    this.publishedLocalScreen = null;
     this.chatChild = null;
-    this.foreground = new ForegroundService();
+    if (Platform.OS === 'android') {
+      this.foreground = new ForegroundService();
+    }
+    this.screenSharingIsStarted = false; //Boolean to know if screen sharing is started
   }
 
   componentDidMount() {
@@ -122,7 +121,7 @@ export default class ReactNativeApiRTC extends React.Component {
       });
 
     /*
-    Screen sharing is not yet avaialble on iOS
+    Screen sharing is not yet available on iOS
     */
     /*
     if (Platform.OS === 'ios') {
@@ -145,7 +144,6 @@ export default class ReactNativeApiRTC extends React.Component {
             this.conversation
               .publish(localStream)
               .then(pubStream => {
-                this.publishedLocalStream = pubStream;
                 this.setState({selfViewSrc: localStream.getData().toURL()});
               })
               .catch(err => {
@@ -265,16 +263,15 @@ export default class ReactNativeApiRTC extends React.Component {
   };
 
   hangUp = () => {
-    if (this.publishedLocalScreen) {
-      this.conversation.unpublish(this.publishedLocalScreen);
+    if (this.localStream) {
+      this.conversation.unpublish(this.localStream);
     }
-    if (this.publishedLocalStream) {
-      this.conversation.unpublish(this.publishedLocalStream);
+    if (this.localScreen) {
+      this.conversation.unpublish(this.localScreen);
     }
-    this.publishedLocalStream = null;
-    this.publishedLocalScreen = null;
     this.localScreen = null;
     this.localStream = null;
+    this.screenSharingIsStarted = false;
     this.conversation.leave().then(() => {
       this.setState({
         selfScreenSrc: null,
@@ -288,8 +285,11 @@ export default class ReactNativeApiRTC extends React.Component {
   };
 
   screenSharing = () => {
-    if (this.state.selfScreenSrc) {
-      this.foreground.stopService();
+    if (this.screenSharingIsStarted) {
+      //Stop screen sharing
+      if (Platform.OS === 'android') {
+        this.foreground.stopService();
+      }
       this.setState({selfScreenSrc: null});
       this.setState({switch_screenShare: false});
       this.setState({screenUserValidated: false});
@@ -298,10 +298,12 @@ export default class ReactNativeApiRTC extends React.Component {
         this.conversation.unpublish(this.localScreen);
       }
       this.localScreen = null;
+      this.screenSharingIsStarted = false;
     } else {
+      //Start screen sharing
       if (Platform.OS === 'ios') {
         /*
-        Screen sharing is not yet avaialble on iOS
+        Screen sharing is not yet available on iOS
         */
         /*
         const reactTag = findNodeHandle(this.screenCaptureView.current);
@@ -313,12 +315,12 @@ export default class ReactNativeApiRTC extends React.Component {
         };
         apiRTC.Stream.createScreensharingStream(displayMediaStreamConstraints)
           .then(localScreenShare => {
+            this.screenSharingIsStarted = true;
             this.localScreen = localScreenShare;
             this.setState({selfScreenSrc: this.localScreen.getData().toURL()});
             this.conversation
               .publish(localScreenShare)
               .then(publishedScreenShare => {
-                this.publishedLocalScreen = publishedScreenShare;
                 this.setState({switch_screenShare: true});
               })
               .catch(err => {
@@ -340,12 +342,12 @@ export default class ReactNativeApiRTC extends React.Component {
         };
         apiRTC.Stream.createScreensharingStream(displayMediaStreamConstraints)
           .then(localScreenShare => {
+            this.screenSharingIsStarted = true;
             this.localScreen = localScreenShare;
             this.setState({selfScreenSrc: this.localScreen.getData().toURL()});
             this.conversation
               .publish(localScreenShare)
               .then(publishedScreenShare => {
-                this.publishedLocalScreen = publishedScreenShare;
                 this.setState({switch_screenShare: true});
               })
               .catch(err => {
@@ -362,11 +364,11 @@ export default class ReactNativeApiRTC extends React.Component {
   mute = () => {
     if (this.state.mute === false) {
       console.info('Mute');
-      this.publishedLocalStream.disableAudio();
+      this.localStream.disableAudio();
       this.setState({mute: true});
     } else {
       console.info('Unmute');
-      this.publishedLocalStream.enableAudio();
+      this.localStream.enableAudio();
       this.setState({mute: false});
     }
   };
@@ -374,11 +376,11 @@ export default class ReactNativeApiRTC extends React.Component {
   muteVideo = () => {
     if (this.state.muteVideo === false) {
       console.info('MuteVideo');
-      this.publishedLocalStream.disableVideo();
+      this.localStream.disableVideo();
       this.setState({muteVideo: true});
     } else {
       console.info('UnmuteVideo');
-      this.publishedLocalStream.enableVideo();
+      this.localStream.enableVideo();
       this.setState({muteVideo: false});
     }
   };
