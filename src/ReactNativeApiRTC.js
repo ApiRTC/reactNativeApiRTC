@@ -404,14 +404,6 @@ export default class ReactNativeApiRTC extends React.Component {
     console.log(`y coord = ${evt.nativeEvent.locationY}`);
   }
 
-  screenOK() {
-    if (this.state.screenUserValidated === false) {
-      this.setState({screenUserValidated: true});
-    } else {
-      this.setState({screenUserValidated: false});
-    }
-  }
-
   screenDisableOK() {
     if (this.state.screenDisableUserValidated === false) {
       this.setState({screenDisableUserValidated: true});
@@ -567,29 +559,6 @@ export default class ReactNativeApiRTC extends React.Component {
           style={styles.selfScreenView}
           streamURL={ctx.state.selfScreenSrc}
         />
-      );
-    }
-
-    function screenCaptureInfoStart(ctx) {
-      if (
-        ctx.state.status !== 'onCall' ||
-        ctx.state.selfScreenSrc === null ||
-        ctx.state.screenUserValidated === true
-      ) {
-        return null;
-      }
-      return (
-        <View style={styles.screenCaptureInformation}>
-          <View style={styles.screenCaptureContainer}>
-            <Text>You are sharing your screen !</Text>
-            <Pressable
-              style={styles.screenCaptureButton}
-              onPress={() => ctx.screenOK()}
-              title="Screen Capture understood">
-              <Text>OK</Text>
-            </Pressable>
-          </View>
-        </View>
       );
     }
 
@@ -869,7 +838,6 @@ export default class ReactNativeApiRTC extends React.Component {
         {renderSelfView(this)}
         {renderScreenSelfView(this)}
         {chat(this)}
-        {screenCaptureInfoStart(this)}
         {screenCaptureInfoStop(this)}
       </View>
     );
