@@ -17,6 +17,10 @@
 		B6A74E892BCFCC650010DC42 /* ReplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6A74E882BCFCC650010DC42 /* ReplayKit.framework */; };
 		B6A74E8C2BCFCC650010DC42 /* SampleHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A74E8B2BCFCC650010DC42 /* SampleHandler.swift */; };
 		B6A74E902BCFCC650010DC42 /* screenSharing_Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B6A74E872BCFCC650010DC42 /* screenSharing_Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B6FB477F2BD16BBE004A1551 /* Atomic.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FB477E2BD16BBE004A1551 /* Atomic.swift */; };
+		B6FB47812BD16BC6004A1551 /* DarwinNotificationCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FB47802BD16BC6004A1551 /* DarwinNotificationCenter.swift */; };
+		B6FB47832BD16BCF004A1551 /* SocketConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FB47822BD16BCF004A1551 /* SocketConnection.swift */; };
+		B6FB47852BD16BD8004A1551 /* SampleUploader.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FB47842BD16BD8004A1551 /* SampleUploader.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,6 +77,10 @@
 		B6A74E8D2BCFCC650010DC42 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B6A74E952BCFF3220010DC42 /* reactNativeApiRTC.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = reactNativeApiRTC.entitlements; path = reactNativeApiRTC/reactNativeApiRTC.entitlements; sourceTree = "<group>"; };
 		B6A74E962BCFF3540010DC42 /* screenSharing_Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = screenSharing_Extension.entitlements; sourceTree = "<group>"; };
+		B6FB477E2BD16BBE004A1551 /* Atomic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Atomic.swift; sourceTree = "<group>"; };
+		B6FB47802BD16BC6004A1551 /* DarwinNotificationCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DarwinNotificationCenter.swift; sourceTree = "<group>"; };
+		B6FB47822BD16BCF004A1551 /* SocketConnection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocketConnection.swift; sourceTree = "<group>"; };
+		B6FB47842BD16BD8004A1551 /* SampleUploader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SampleUploader.swift; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -182,6 +190,10 @@
 		B6A74E8A2BCFCC650010DC42 /* screenSharing_Extension */ = {
 			isa = PBXGroup;
 			children = (
+				B6FB47842BD16BD8004A1551 /* SampleUploader.swift */,
+				B6FB47822BD16BCF004A1551 /* SocketConnection.swift */,
+				B6FB47802BD16BC6004A1551 /* DarwinNotificationCenter.swift */,
+				B6FB477E2BD16BBE004A1551 /* Atomic.swift */,
 				B6A74E962BCFF3540010DC42 /* screenSharing_Extension.entitlements */,
 				B6A74E8B2BCFCC650010DC42 /* SampleHandler.swift */,
 				B6A74E8D2BCFCC650010DC42 /* Info.plist */,
@@ -504,6 +516,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B6FB477F2BD16BBE004A1551 /* Atomic.swift in Sources */,
+				B6FB47812BD16BC6004A1551 /* DarwinNotificationCenter.swift in Sources */,
+				B6FB47832BD16BCF004A1551 /* SocketConnection.swift in Sources */,
+				B6FB47852BD16BD8004A1551 /* SampleUploader.swift in Sources */,
 				B6A74E8C2BCFCC650010DC42 /* SampleHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -323,17 +323,16 @@ export default class ReactNativeApiRTC extends React.Component {
             this.screenSharingIsStarted = true;
             this.localScreen = localScreenShare;
             this.setState({selfScreenSrc: this.localScreen.getData().toURL()});
-            /*
 
             this.conversation
               .publish(localScreenShare)
               .then(publishedScreenShare => {
+                this.localScreenIsPublished = true;
                 this.setState({switch_screenShare: true});
               })
               .catch(err => {
                 console.error(err);
               });
-            */
           })
           .catch(err => {
             console.error(err);
@@ -355,6 +354,7 @@ export default class ReactNativeApiRTC extends React.Component {
             this.conversation
               .publish(localScreenShare)
               .then(publishedScreenShare => {
+                this.localScreenIsPublished = true;
                 this.setState({switch_screenShare: true});
               })
               .catch(err => {
