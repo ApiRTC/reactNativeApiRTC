@@ -289,22 +289,32 @@ export default class ReactNativeApiRTC extends React.Component {
     });
   };
 
+  stopScreenSharingProcess = () => {
+    //Stop screen sharing
+    if (Platform.OS === 'android') {
+      this.foreground.stopService();
+    }
+    this.setState({selfScreenSrc: null});
+    this.setState({switch_screenShare: false});
+    this.setState({screenUserValidated: false});
+    this.setState({screenDisableUserValidated: false});
+    if (this.localScreen && this.localScreenIsPublished) {
+      this.conversation.unpublish(this.localScreen);
+      this.localScreenIsPublished = false;
+    }
+    this.localScreen = null;
+    this.screenSharingIsStarted = false;
+  };
+
+  stoppedEventListener = () => {
+    console.debug('Screen sharing stream has been stopped');
+    this.stopScreenSharingProcess();
+  };
+
   screenSharing = () => {
     if (this.screenSharingIsStarted) {
       //Stop screen sharing
-      if (Platform.OS === 'android') {
-        this.foreground.stopService();
-      }
-      this.setState({selfScreenSrc: null});
-      this.setState({switch_screenShare: false});
-      this.setState({screenUserValidated: false});
-      this.setState({screenDisableUserValidated: false});
-      if (this.localScreen && this.localScreenIsPublished) {
-        this.conversation.unpublish(this.localScreen);
-        this.localScreenIsPublished = false;
-      }
-      this.localScreen = null;
-      this.screenSharingIsStarted = false;
+      this.stopScreenSharingProcess();
     } else {
       //Start screen sharing
       if (Platform.OS === 'ios') {
@@ -323,6 +333,8 @@ export default class ReactNativeApiRTC extends React.Component {
             this.screenSharingIsStarted = true;
             this.localScreen = localScreenShare;
             this.setState({selfScreenSrc: this.localScreen.getData().toURL()});
+
+            this.localScreen.on('stopped', this.stoppedEventListener);
 
             this.conversation
               .publish(localScreenShare)
