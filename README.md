@@ -106,3 +106,9 @@ add following lines in bash_profile file:
 source ~/.bash_profile //To apply modifications
 
 echo $ANDROID_HOME //To check modifications
+
+### iOS Screensharing
+
+Our application includes the possibility to share screen on iOS.
+Several steps are needed to add this feature on your application : 
+Here is [the documentation](Docs/add_screenSharing_on_iOS.md) to help you in this task.
