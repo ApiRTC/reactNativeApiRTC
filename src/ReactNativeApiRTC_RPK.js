@@ -4,13 +4,8 @@ class ReactNativeApiRTC_RPK extends NativeEventEmitter {
   constructor(nativeModule) {
     super(nativeModule);
 
-    this.setBroadcastExtensionAsActive =
-      Platform.OS === 'ios' ? nativeModule.setBroadcastExtensionAsActive : null;
-
-    this.setBroadcastExtensionAsInactive =
-      Platform.OS === 'ios'
-        ? nativeModule.setBroadcastExtensionAsInactive
-        : null;
+    this.sendBroadcastNeedToBeStopped =
+      Platform.OS === 'ios' ? nativeModule.sendBroadcastNeedToBeStopped : null;
   }
 }
 

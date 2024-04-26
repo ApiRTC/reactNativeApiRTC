@@ -10,6 +10,5 @@
 #import "React/RCTEventEmitter.h"
 
 @interface RCT_EXTERN_MODULE(ReactNativeApiRTC_RPK, RCTEventEmitter)
-RCT_EXTERN_METHOD(setBroadcastExtensionAsActive)
-RCT_EXTERN_METHOD(setBroadcastExtensionAsInactive)
+RCT_EXTERN_METHOD(sendBroadcastNeedToBeStopped)
 @end

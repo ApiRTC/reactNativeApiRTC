@@ -6,7 +6,7 @@
 //
 
 import ReplayKit
-//import OSLog //TEMP
+//import OSLog
 
 private enum Constants {
     // the App Group ID value that the app and the broadcast extension targets are setup with. It differs for each app.
@@ -21,47 +21,41 @@ class SampleHandler: RPBroadcastSampleHandler {
     private var uploader: SampleUploader?
     
     private var frameCount: Int = 0
-    var timerDS: DSTimer?
     
     var socketFilePath: String {
-      let sharedContainer = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: Constants.appGroupIdentifier)
+        let sharedContainer = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: Constants.appGroupIdentifier)
         return sharedContainer?.appendingPathComponent("rtc_SSFD").path ?? ""
+    }
+
+    var needtobestopped_notification_callback: CFNotificationCallback = { center, observer, name, object, info in
+        NotificationCenter.default.post(name: Notification.Name("NEED_TO_BE_STOPPED_BROADCAST"), object: nil)
     }
 
     override init() {
       super.init()
         if let connection = SocketConnection(filePath: socketFilePath) {
-          clientConnection = connection
-          setupConnection()
-          
-          uploader = SampleUploader(connection: connection)
+            clientConnection = connection
+            setupConnection()
+            uploader = SampleUploader(connection: connection)
         }
+
+        //Setting observer for broadcastneedtobestopped notification from application
+        NotificationCenter.default.addObserver(self, selector: #selector(self.needToBeStoppedBroadcastCallback(notification:)), name: Notification.Name("NEED_TO_BE_STOPPED_BROADCAST"), object: nil)
+
+        let notificationStartIdentifier = "com.reactnativeapirtc.notification.broadcastneedtobestopped" as CFString
+        let notificationCenter = CFNotificationCenterGetDarwinNotifyCenter()
+    
+        CFNotificationCenterAddObserver(notificationCenter,
+                                        nil,
+                                        needtobestopped_notification_callback,
+                                        notificationStartIdentifier,
+                                        nil,
+                                        CFNotificationSuspensionBehavior.deliverImmediately)
     }
   
     override func broadcastStarted(withSetupInfo setupInfo: [String : NSObject]?) {
         // User has requested to start the broadcast. Setup info from the UI extension can be supplied but optional. 
-        //logger.error("QQQ: broadcastStarted") //TEMP
-
-        //Setting a timer to check if the user has requested to stop the broadcast
-        //if broadcastNeedToBeStopped is true, we finish the broadcast with an error
-        self.timerDS = DSTimer.schedule(interval: .seconds(1), block: {
-            //self.logger.error("QQQ: timer fired")
-          
-            let valueForBroadcastNeedToBeStopped = UserDefaults(suiteName: "group.apirtc.reactNativeApiRTC.broadcast")?.bool(forKey: "broadcastNeedToBeStopped")
-
-            if (valueForBroadcastNeedToBeStopped == true) {
-                //self.logger.error("QQQ: TRUE in timer)")
-
-                // the displayed failure message is more user friendly when using NSError instead of Error
-                let JMScreenSharingStopped = 10001
-                let customError = NSError(domain: RPRecordingErrorDomain, code: JMScreenSharingStopped, userInfo: [NSLocalizedDescriptionKey: "User has requested screen sharing to be stopped"])
-                self.finishBroadcastWithError(customError)
-
-            } //else {
-              //self.logger.error("QQQ: ELSE TRUE in timer")
-            //}
-        }).run()
-
+        //logger.error("QQQ: broadcastStarted")
         frameCount = 0
         
         DarwinNotificationCenter.shared.postNotification(.broadcastStarted)
@@ -75,17 +69,17 @@ class SampleHandler: RPBroadcastSampleHandler {
     
     override func broadcastPaused() {
         // User has requested to pause the broadcast. Samples will stop being delivered.
-        //logger.error("QQQ: broadcastPaused") //TEMP
+        //logger.error("QQQ: broadcastPaused")
     }
     
     override func broadcastResumed() {
         // User has requested to resume the broadcast. Samples delivery will resume.
-        //logger.error("QQQ: broadcastResumed") //TEMP
+        //logger.error("QQQ: broadcastResumed")
     }
     
     override func broadcastFinished() {
         // User has requested to finish the broadcast.
-        //logger.error("QQQ: broadcastFinished") //TEMP
+        //logger.error("QQQ: broadcastFinished")
       
         DarwinNotificationCenter.shared.postNotification(.broadcastStopped)
         clientConnection?.close()
@@ -144,10 +138,20 @@ private extension SampleHandler {
             guard self?.clientConnection?.open() == true else {
                 return
             }
-            
             timer.cancel()
         }
-        
         timer.resume()
+    }
+
+    @objc func needToBeStoppedBroadcastCallback(notification: NSNotification){
+        //logger.error("QQQ: needToBeStoppedBroadcastCallback")
+        
+        //needToBeStoppedBroadcast notification received from the application
+        //stopping the broadcast extension with finishBroadcastWithError()
+      
+        // the displayed failure message is more user friendly when using NSError instead of Error
+        let JMScreenSharingStopped = 10001
+        let customError = NSError(domain: RPRecordingErrorDomain, code: JMScreenSharingStopped, userInfo: [NSLocalizedDescriptionKey: "User has requested screen sharing to be stopped"])
+        self.finishBroadcastWithError(customError)
     }
 }

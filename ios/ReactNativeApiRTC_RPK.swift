@@ -62,19 +62,13 @@ class ReactNativeApiRTC_RPK: RCTEventEmitter {
     status = "Empty"
   }
 
-  //These two following functions set 'broadcastNeedToBeStopped' value to be shared with extension
-  //This parameter enable us to manage status of the broadcast on the extension
-  //and to stop the broadcast from the extension
+  //This function is used to send a notification to the extension to stop the broadcast
   @objc
-  func setBroadcastExtensionAsActive() {
-    //Set the value of 'broadcastNeedToBeStopped' to false
-    UserDefaults(suiteName: "group.apirtc.reactNativeApiRTC.broadcast")?.set(false,forKey: "broadcastNeedToBeStopped") //OK
-  }
-  
-  @objc
-  func setBroadcastExtensionAsInactive() {
-    //Set the value of 'broadcastNeedToBeStopped' to true
-    UserDefaults(suiteName: "group.apirtc.reactNativeApiRTC.broadcast")?.set(true,forKey: "broadcastNeedToBeStopped") //OK
+  func sendBroadcastNeedToBeStopped() {
+    //Sending event to screen sharing extension
+    let notificationName = CFNotificationName("com.reactnativeapirtc.notification.broadcastneedtobestopped" as CFString)
+    let notificationCenter = CFNotificationCenterGetDarwinNotifyCenter()
+    CFNotificationCenterPostNotification(notificationCenter, notificationName, nil, nil, true)
   }
   
   override func supportedEvents() -> [String]! {

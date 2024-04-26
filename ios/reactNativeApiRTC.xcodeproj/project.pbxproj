@@ -23,7 +23,6 @@
 		B6FB47852BD16BD8004A1551 /* SampleUploader.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FB47842BD16BD8004A1551 /* SampleUploader.swift */; };
 		B6FB478F2BD6BF61004A1551 /* ReactNativeApiRTC_RPK.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FB478E2BD6BF61004A1551 /* ReactNativeApiRTC_RPK.swift */; };
 		B6FB47912BD6BFB3004A1551 /* ReactNativeApiRTC_RPK.m in Sources */ = {isa = PBXBuildFile; fileRef = B6FB47902BD6BFB3004A1551 /* ReactNativeApiRTC_RPK.m */; };
-		B6FB47952BD943E4004A1551 /* DSTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FB47942BD943E4004A1551 /* DSTimer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -87,7 +86,6 @@
 		B6FB478D2BD6BF61004A1551 /* reactNativeApiRTC-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "reactNativeApiRTC-Bridging-Header.h"; sourceTree = "<group>"; };
 		B6FB478E2BD6BF61004A1551 /* ReactNativeApiRTC_RPK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReactNativeApiRTC_RPK.swift; sourceTree = "<group>"; };
 		B6FB47902BD6BFB3004A1551 /* ReactNativeApiRTC_RPK.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ReactNativeApiRTC_RPK.m; sourceTree = "<group>"; };
-		B6FB47942BD943E4004A1551 /* DSTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DSTimer.swift; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -207,7 +205,6 @@
 				B6A74E962BCFF3540010DC42 /* screenSharing_Extension.entitlements */,
 				B6A74E8B2BCFCC650010DC42 /* SampleHandler.swift */,
 				B6A74E8D2BCFCC650010DC42 /* Info.plist */,
-				B6FB47942BD943E4004A1551 /* DSTimer.swift */,
 			);
 			path = screenSharing_Extension;
 			sourceTree = "<group>";
@@ -533,7 +530,6 @@
 				B6FB47812BD16BC6004A1551 /* DarwinNotificationCenter.swift in Sources */,
 				B6FB47832BD16BCF004A1551 /* SocketConnection.swift in Sources */,
 				B6FB47852BD16BD8004A1551 /* SampleUploader.swift in Sources */,
-				B6FB47952BD943E4004A1551 /* DSTimer.swift in Sources */,
 				B6A74E8C2BCFCC650010DC42 /* SampleHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

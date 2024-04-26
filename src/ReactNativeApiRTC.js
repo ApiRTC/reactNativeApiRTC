@@ -277,7 +277,7 @@ export default class ReactNativeApiRTC extends React.Component {
     //Stop screen sharing
     if (Platform.OS === 'ios') {
       //Sending stop screen sharing request to the extension
-      ReactNativeApiRTC_RPK.setBroadcastExtensionAsInactive();
+      ReactNativeApiRTC_RPK.sendBroadcastNeedToBeStopped();
     }
 
     //Managing stop screen sharing on the application
@@ -324,7 +324,7 @@ export default class ReactNativeApiRTC extends React.Component {
 
       if (Platform.OS === 'ios') {
         //Sending stop screen sharing request to the extension
-        ReactNativeApiRTC_RPK.setBroadcastExtensionAsInactive();
+        ReactNativeApiRTC_RPK.sendBroadcastNeedToBeStopped();
       }
 
       //Managing stop screen sharing on the application
@@ -332,8 +332,6 @@ export default class ReactNativeApiRTC extends React.Component {
     } else {
       //Start screen sharing
       if (Platform.OS === 'ios') {
-        //Initialising screen sharing status for the extension
-        ReactNativeApiRTC_RPK.setBroadcastExtensionAsActive();
 
         const reactTag = findNodeHandle(this.screenCaptureView.current);
         NativeModules.ScreenCapturePickerViewManager.show(reactTag);
@@ -358,8 +356,6 @@ export default class ReactNativeApiRTC extends React.Component {
               .catch(err => {
                 console.error(err);
               });
-
-            ReactNativeApiRTC_RPK.setBroadcastExtensionAsActive();
 
           } else if (event === 'STOP_BROADCAST') {
             console.debug('Broadcast stopped');
