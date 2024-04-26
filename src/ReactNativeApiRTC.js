@@ -13,6 +13,7 @@ import {
   Platform,
   findNodeHandle,
   NativeModules,
+  Image,
 } from 'react-native';
 
 import {
@@ -32,6 +33,8 @@ import '@apirtc/react-native-apirtc';
 
 import ForegroundService from './ForegroundService';
 import Chat_apiRTC from './Chat_apiRTC';
+import ReactNativeApiRTC_RPK from './ReactNativeApiRTC_RPK'; //This is to manage interaction with screen sharing extension on iOS
+
 /*
                 DRAG_AND_DROP :
                 You can uncomment the following line to add possibility to drag and drop local video view.
@@ -124,9 +127,6 @@ export default class ReactNativeApiRTC extends React.Component {
         console.error('Error on register : ', err);
       });
 
-    /*
-    Screen sharing is not yet available on iOS
-    */
     if (Platform.OS === 'ios') {
       this.screenCaptureView = createRef(null);
     }
@@ -270,13 +270,20 @@ export default class ReactNativeApiRTC extends React.Component {
       this.conversation.unpublish(this.localStream);
       this.localStreamIsPublished = false;
     }
-    if (this.localScreen && this.localScreenIsPublished) {
-      this.conversation.unpublish(this.localScreen);
-      this.localScreenIsPublished = false;
-    }
-    this.localScreen = null;
+
+    this.localStream.release();
     this.localStream = null;
-    this.screenSharingIsStarted = false;
+
+    //Stop screen sharing
+    if (Platform.OS === 'ios') {
+      //Sending stop screen sharing request to the extension
+      ReactNativeApiRTC_RPK.setBroadcastExtensionAsInactive();
+    }
+
+    //Managing stop screen sharing on the application
+    this.stopScreenSharingProcess();
+    this.localScreen = null;
+
     this.conversation.leave().then(() => {
       this.setState({
         selfScreenSrc: null,
@@ -314,13 +321,20 @@ export default class ReactNativeApiRTC extends React.Component {
   screenSharing = () => {
     if (this.screenSharingIsStarted) {
       //Stop screen sharing
+
+      if (Platform.OS === 'ios') {
+        //Sending stop screen sharing request to the extension
+        ReactNativeApiRTC_RPK.setBroadcastExtensionAsInactive();
+      }
+
+      //Managing stop screen sharing on the application
       this.stopScreenSharingProcess();
     } else {
       //Start screen sharing
       if (Platform.OS === 'ios') {
-        /*
-        Screen sharing is not yet available on iOS
-        */
+        //Initialising screen sharing status for the extension
+        ReactNativeApiRTC_RPK.setBroadcastExtensionAsActive();
+
         const reactTag = findNodeHandle(this.screenCaptureView.current);
         NativeModules.ScreenCapturePickerViewManager.show(reactTag);
 
@@ -328,16 +342,15 @@ export default class ReactNativeApiRTC extends React.Component {
           video: true,
           audio: false,
         };
-        apiRTC.Stream.createScreensharingStream(displayMediaStreamConstraints)
-          .then(localScreenShare => {
-            this.screenSharingIsStarted = true;
-            this.localScreen = localScreenShare;
-            this.setState({selfScreenSrc: this.localScreen.getData().toURL()});
 
-            this.localScreen.on('stopped', this.stoppedEventListener);
-
+        //Add listener for screen sharing event coming from the extension
+        ReactNativeApiRTC_RPK.addListener('onScreenShare', event => {
+          if (event === 'START_BROADCAST') {
+            console.debug('Broadcast started');
+            //Broadcast is started on extension side
+            //We can publish the screen sharing stream to the conversation
             this.conversation
-              .publish(localScreenShare)
+              .publish(this.localScreen)
               .then(publishedScreenShare => {
                 this.localScreenIsPublished = true;
                 this.setState({switch_screenShare: true});
@@ -345,6 +358,22 @@ export default class ReactNativeApiRTC extends React.Component {
               .catch(err => {
                 console.error(err);
               });
+
+            ReactNativeApiRTC_RPK.setBroadcastExtensionAsActive();
+
+          } else if (event === 'STOP_BROADCAST') {
+            console.debug('Broadcast stopped');
+          }
+        });
+
+        apiRTC.Stream.createScreensharingStream(displayMediaStreamConstraints)
+          .then(localScreenShare => {
+            this.screenSharingIsStarted = true;
+            this.localScreen = localScreenShare;
+            this.setState({selfScreenSrc: this.localScreen.getData().toURL()});
+
+            //Adding listener for screen sharing stop event
+            this.localScreen.on('stopped', this.stoppedEventListener);
           })
           .catch(err => {
             console.error(err);
@@ -573,12 +602,23 @@ export default class ReactNativeApiRTC extends React.Component {
       if (ctx.state.status !== 'onCall' || ctx.state.selfScreenSrc === null) {
         return null;
       }
-      return (
-        <RTCView
-          style={styles.selfScreenView}
-          streamURL={ctx.state.selfScreenSrc}
-        />
-      );
+      if (Platform.OS === 'ios') {
+        //We can't display screen sharing stream locally on iOS : replacing stream by an image
+        return (
+          <Image
+            style={styles.selfScreenViewImg}
+            source={require('./images/screenSharingOngoing.png')}
+          />
+        );
+      } else {
+        //Android : display screen sharing stream locally
+        return (
+          <RTCView
+            style={styles.selfScreenView}
+            streamURL={ctx.state.selfScreenSrc}
+          />
+        );
+      }
     }
 
     function screenCaptureInfoStop(ctx) {
@@ -697,9 +737,6 @@ export default class ReactNativeApiRTC extends React.Component {
     }
 
     function displayScreenShare(ctx) {
-      if (Platform.OS === 'ios') {
-        return null;
-      }
       return (
         <TouchableOpacity
           style={styles.renderButtonComponent}

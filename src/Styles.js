@@ -92,6 +92,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
     elevation: 99,
   },
+  selfScreenViewImg: {
+    position: 'absolute',
+    width: '20%',
+    height: '20%',
+    bottom: 70,
+    right: '20%',
+    backgroundColor: 'black',
+  },
   chatButton: {
     position: 'absolute',
     bottom: '5%',

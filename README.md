@@ -39,13 +39,14 @@ Here is the list of supported feature depending on mobile OS
 | Media routing : Mesh  | :white_check_mark: | :white_check_mark: |
 | Chat     | :white_check_mark: | :white_check_mark: |
 | Record     | :white_check_mark: | :white_check_mark: |
-| Screensharing   | :white_check_mark: | :x: |
+| Screensharing   | :white_check_mark: | :white_check_mark: |
 
 Option in application sample :
 - Drag & drop video local (check comment with DRAG_AND_DROP in code)
 
 ## Compatibility
 - This demo is compatible with iOS 12+ & Android 10+
+- ScreenSharing on iOS needs iOS 14+
 
 ## Demo Usage
 
@@ -56,6 +57,9 @@ Then you can open [apiRTC Conference demo](https://apirtc.github.io/ApiRTC-examp
 
 ### Requirements
 * React Native needs Node.js >= 16 (Check [NVM](https://github.com/nvm-sh/nvm) if needed)
+
+### Restrictions
+* iOS screenSharing : screenSharing stream cannot be displayed locally on the application on iOS
 
 ### What are the authorizations that are need to be declared on application
 

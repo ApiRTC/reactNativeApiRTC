@@ -6,7 +6,7 @@
 //
 
 import ReplayKit
-import OSLog //TEMP
+//import OSLog //TEMP
 
 private enum Constants {
     // the App Group ID value that the app and the broadcast extension targets are setup with. It differs for each app.
@@ -15,19 +15,19 @@ private enum Constants {
 
 class SampleHandler: RPBroadcastSampleHandler {
 
-    var logger = Logger() //TEMP
+    //var logger = Logger()
   
-//ADDED
     private var clientConnection: SocketConnection?
     private var uploader: SampleUploader?
     
     private var frameCount: Int = 0
+    var timerDS: DSTimer?
     
     var socketFilePath: String {
       let sharedContainer = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: Constants.appGroupIdentifier)
         return sharedContainer?.appendingPathComponent("rtc_SSFD").path ?? ""
     }
-    
+
     override init() {
       super.init()
         if let connection = SocketConnection(filePath: socketFilePath) {
@@ -37,51 +37,74 @@ class SampleHandler: RPBroadcastSampleHandler {
           uploader = SampleUploader(connection: connection)
         }
     }
-//FIN ADDED
   
     override func broadcastStarted(withSetupInfo setupInfo: [String : NSObject]?) {
         // User has requested to start the broadcast. Setup info from the UI extension can be supplied but optional. 
-        logger.error("QQQ: broadcastStarted") //TEMP
-      
-//ADDED
+        //logger.error("QQQ: broadcastStarted") //TEMP
+
+        //Setting a timer to check if the user has requested to stop the broadcast
+        //if broadcastNeedToBeStopped is true, we finish the broadcast with an error
+        self.timerDS = DSTimer.schedule(interval: .seconds(1), block: {
+            //self.logger.error("QQQ: timer fired")
+          
+            let valueForBroadcastNeedToBeStopped = UserDefaults(suiteName: "group.apirtc.reactNativeApiRTC.broadcast")?.bool(forKey: "broadcastNeedToBeStopped")
+
+            if (valueForBroadcastNeedToBeStopped == true) {
+                //self.logger.error("QQQ: TRUE in timer)")
+
+                // the displayed failure message is more user friendly when using NSError instead of Error
+                let JMScreenSharingStopped = 10001
+                let customError = NSError(domain: RPRecordingErrorDomain, code: JMScreenSharingStopped, userInfo: [NSLocalizedDescriptionKey: "User has requested screen sharing to be stopped"])
+                self.finishBroadcastWithError(customError)
+
+            } //else {
+              //self.logger.error("QQQ: ELSE TRUE in timer")
+            //}
+        }).run()
+
         frameCount = 0
         
         DarwinNotificationCenter.shared.postNotification(.broadcastStarted)
         openConnection()
-//FIN ADDED
+
+        //Sending event to application
+        let notificationName = CFNotificationName("com.reactnativeapirtc.notification.broadcaststart" as CFString)
+        let notificationCenter = CFNotificationCenterGetDarwinNotifyCenter()
+        CFNotificationCenterPostNotification(notificationCenter, notificationName, nil, nil, true)
     }
     
     override func broadcastPaused() {
         // User has requested to pause the broadcast. Samples will stop being delivered.
-        logger.error("QQQ: broadcastPaused") //TEMP
+        //logger.error("QQQ: broadcastPaused") //TEMP
     }
     
     override func broadcastResumed() {
         // User has requested to resume the broadcast. Samples delivery will resume.
-        logger.error("QQQ: broadcastResumed") //TEMP
+        //logger.error("QQQ: broadcastResumed") //TEMP
     }
     
     override func broadcastFinished() {
         // User has requested to finish the broadcast.
-        logger.error("QQQ: broadcastFinished") //TEMP
+        //logger.error("QQQ: broadcastFinished") //TEMP
       
-//ADDED
         DarwinNotificationCenter.shared.postNotification(.broadcastStopped)
         clientConnection?.close()
-//FIN ADDED
+
+        let notificationName = CFNotificationName("com.reactnativeapirtc.notification.broadcaststop" as CFString)
+        let notificationCenter = CFNotificationCenterGetDarwinNotifyCenter()
+        CFNotificationCenterPostNotification(notificationCenter, notificationName, nil, nil, true)
     }
     
     override func processSampleBuffer(_ sampleBuffer: CMSampleBuffer, with sampleBufferType: RPSampleBufferType) {
         switch sampleBufferType {
         case RPSampleBufferType.video:
             // Handle video sample buffer
-//ADDED
+
             // very simple mechanism for adjusting frame rate by using every third frame
             frameCount += 1
             if frameCount % 3 == 0 {
                 uploader?.send(sample: sampleBuffer)
             }
-//FIN ADDED
             break
         case RPSampleBufferType.audioApp:
             // Handle audio sample buffer for app audio
@@ -96,9 +119,8 @@ class SampleHandler: RPBroadcastSampleHandler {
     }
 }
 
-//ADDED
 private extension SampleHandler {
-  
+
     func setupConnection() {
         clientConnection?.didClose = { [weak self] error in
             print("client connection did close \(String(describing: error))")
@@ -129,4 +151,3 @@ private extension SampleHandler {
         timer.resume()
     }
 }
-//FIN ADDED
