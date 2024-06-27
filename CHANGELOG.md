@@ -1,4 +1,4 @@
-## [1.0.1]() (2024-06-26)
+## [1.0.1](https://github.com/ApiRTC/reactNativeApiRTC/releases/tag/1.0.1) (2024-06-26)
 
 ### Dependencies
 - react-native-webrtc : 124.0.1 (Upgrade)
