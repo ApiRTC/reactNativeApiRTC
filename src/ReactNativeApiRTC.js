@@ -14,6 +14,7 @@ import {
   findNodeHandle,
   NativeModules,
   Image,
+  StyleSheet,
 } from 'react-native';
 
 import {
@@ -42,6 +43,7 @@ import ReactNativeApiRTC_RPK from './ReactNativeApiRTC_RPK'; //This is to manage
 //import MovingViewWithPanResponder from './panSelfView';
 import Svg_bubble_speech from '../assets/svg/Bubble-speech.js';
 import {styles} from './Styles';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 
 /* Import SVG */
 import Microphone_on from '../assets/svg/Microphone_on.js';
@@ -59,6 +61,7 @@ import Camera_record from '../assets/svg/Camera_record.js';
 const initialState = {
   initStatus: 'Registration ongoing',
   info: '',
+  connected: 'notconnected',
   status: 'pickConv',
   selfViewSrc: null,
   selfScreenSrc: null,
@@ -71,15 +74,13 @@ const initialState = {
   mute: false, // --| Use for mute state and switch state
   muteVideo: false, // --|
   chatOpen: false,
-  screenUserValidated: false,
-  screenDisableUserValidated: true,
+  displayScreenInfoStop: false,
   menuOpen: false,
   coordX: 0,
   coordY: 0,
   isRecording: false,
   remoteMenuOpen: false,
   remoteIdSelected: null,
-  switch_screenShare: false,
   newMessage: null,
   cameraIsFront: true,
   timer: null,
@@ -117,11 +118,14 @@ export default class ReactNativeApiRTC extends React.Component {
       uri: 'apzkey:myDemoApiKey',
     });
 
+    this.setUAListeners();
+
     var registerInformation = {};
     this.ua
       .register(registerInformation)
       .then(session => {
         this.connectedSession = session;
+        this.setState({connected: 'connected'}); //This will enable render to display correct connexion status
       })
       .catch(err => {
         console.error('Error on register : ', err);
@@ -130,6 +134,35 @@ export default class ReactNativeApiRTC extends React.Component {
     if (Platform.OS === 'ios') {
       this.screenCaptureView = createRef(null);
     }
+  }
+
+  setUAListeners() {
+    this.ua.on('ccsConnectionStatus', event => {
+      console.debug('ccsConnectionStatus : ', event);
+      switch (event.status) {
+        case 'connected':
+          console.debug('connected : ', event);
+          this.setState({connected: 'connected'}); //This will enable render to display correct connexion status
+          break;
+        case 'retry':
+          console.debug('reconnecting : ', event);
+          this.setState({connected: 'reconnecting'}); //This will enable render to display correct connexion status
+          break;
+        case 'disconnected':
+          console.debug('disconnect : ', event);
+          this.setState({connected: 'disconnect'}); //This will enable render to display correct connexion status
+          break;
+        case 'error':
+          console.debug('error : ', event);
+          this.setState({connected: 'disconnect'}); //This will enable render to display correct connexion status
+          break;
+        default:
+          console.log(
+            'ccsConnectionStatus not managed case for :',
+            event.status,
+          );
+      }
+    });
   }
 
   joinConversation() {
@@ -162,7 +195,7 @@ export default class ReactNativeApiRTC extends React.Component {
       });
   }
 
-  setListeners() {
+  setConversationListeners() {
     this.conversation.on('contactJoined', newContact => {
       console.info('REACT - Contact list change');
       let array_contact = this.state.connectedUsersList;
@@ -256,7 +289,7 @@ export default class ReactNativeApiRTC extends React.Component {
           meshOnlyEnabled: false,
         },
       );
-      this.setListeners();
+      this.setConversationListeners();
       this.joinConversation();
     } else {
       console.error(
@@ -270,9 +303,10 @@ export default class ReactNativeApiRTC extends React.Component {
       this.conversation.unpublish(this.localStream);
       this.localStreamIsPublished = false;
     }
-
-    this.localStream.release();
-    this.localStream = null;
+    if (this.localStream) {
+      this.localStream.release();
+      this.localStream = null;
+    }
 
     //Stop screen sharing
     if (Platform.OS === 'ios') {
@@ -281,8 +315,10 @@ export default class ReactNativeApiRTC extends React.Component {
     }
 
     //Managing stop screen sharing on the application
-    this.stopScreenSharingProcess();
-    this.localScreen = null;
+    if (this.screenSharingIsStarted) {
+      this.stopScreenSharingProcess();
+      this.localScreen = null;
+    }
 
     this.conversation.leave().then(() => {
       this.setState({
@@ -302,9 +338,7 @@ export default class ReactNativeApiRTC extends React.Component {
       this.foreground.stopService();
     }
     this.setState({selfScreenSrc: null});
-    this.setState({switch_screenShare: false});
-    this.setState({screenUserValidated: false});
-    this.setState({screenDisableUserValidated: false});
+    this.setState({displayScreenInfoStop: true});
     if (this.localScreen && this.localScreenIsPublished) {
       this.conversation.unpublish(this.localScreen);
       this.localScreenIsPublished = false;
@@ -313,7 +347,7 @@ export default class ReactNativeApiRTC extends React.Component {
     this.screenSharingIsStarted = false;
   };
 
-  stoppedEventListener = () => {
+  stoppedEventListenerOnScreenStream = () => {
     console.debug('Screen sharing stream has been stopped');
     this.stopScreenSharingProcess();
   };
@@ -332,7 +366,6 @@ export default class ReactNativeApiRTC extends React.Component {
     } else {
       //Start screen sharing
       if (Platform.OS === 'ios') {
-
         const reactTag = findNodeHandle(this.screenCaptureView.current);
         NativeModules.ScreenCapturePickerViewManager.show(reactTag);
 
@@ -351,12 +384,10 @@ export default class ReactNativeApiRTC extends React.Component {
               .publish(this.localScreen)
               .then(publishedScreenShare => {
                 this.localScreenIsPublished = true;
-                this.setState({switch_screenShare: true});
               })
               .catch(err => {
                 console.error(err);
               });
-
           } else if (event === 'STOP_BROADCAST') {
             console.debug('Broadcast stopped');
           }
@@ -369,7 +400,10 @@ export default class ReactNativeApiRTC extends React.Component {
             this.setState({selfScreenSrc: this.localScreen.getData().toURL()});
 
             //Adding listener for screen sharing stop event
-            this.localScreen.on('stopped', this.stoppedEventListener);
+            this.localScreen.on(
+              'stopped',
+              this.stoppedEventListenerOnScreenStream,
+            );
           })
           .catch(err => {
             console.error(err);
@@ -392,7 +426,6 @@ export default class ReactNativeApiRTC extends React.Component {
               .publish(localScreenShare)
               .then(publishedScreenShare => {
                 this.localScreenIsPublished = true;
-                this.setState({switch_screenShare: true});
               })
               .catch(err => {
                 console.error('Error on publish stream for screenShare :', err);
@@ -449,11 +482,7 @@ export default class ReactNativeApiRTC extends React.Component {
   }
 
   screenDisableOK() {
-    if (this.state.screenDisableUserValidated === false) {
-      this.setState({screenDisableUserValidated: true});
-    } else {
-      this.setState({screenDisableUnscreenDisableUserValidatedderStood: false});
-    }
+    this.setState({displayScreenInfoStop: false});
   }
 
   menu() {
@@ -550,7 +579,32 @@ export default class ReactNativeApiRTC extends React.Component {
       ctx.state.roomName = value;
     }
 
-    function renderPicker(ctx) {
+    function renderApiRTCCnx(ctx) {
+      if (ctx.state.connected === 'connected') {
+        return (
+          <Text>
+            {' ApiRTC connection status :'}
+            <FontAwesomeIcon icon="cloud" color={'green'} />
+          </Text>
+        );
+      } else if (ctx.state.connected === 'reconnecting') {
+        return (
+          <Text>
+            {' ApiRTC connection status :'}
+            <FontAwesomeIcon icon="cloud" color={'orange'} />
+          </Text>
+        );
+      } else {
+        return (
+          <Text>
+            {' ApiRTC connection status :'}
+            <FontAwesomeIcon icon="cloud" color={'red'} />
+          </Text>
+        );
+      }
+    }
+
+    function renderWelcomeText(ctx) {
       if (ctx.state.status !== 'pickConv') {
         return null;
       }
@@ -561,10 +615,20 @@ export default class ReactNativeApiRTC extends React.Component {
             {'\n'}
             {'\n'}
           </Text>
+        </View>
+      );
+    }
+
+    function renderPicker(ctx) {
+      if (ctx.state.status !== 'pickConv') {
+        return null;
+      }
+      return (
+        <View style={{flexDirection: 'row'}}>
           <TextInput
             onChangeText={val => setRoom(ctx, val)}
             style={styles.input}
-            placeholder={'Enter your Conference name'}
+            placeholder={' Enter your Conference name'}
           />
           <Button
             onPress={ctx.call}
@@ -572,6 +636,29 @@ export default class ReactNativeApiRTC extends React.Component {
             color="#0080FF"
             accessibilityLabel="Join Conference"
           />
+        </View>
+      );
+    }
+
+    function renderFooter(ctx) {
+      if (ctx.state.status !== 'pickConv') {
+        return null;
+      }
+      return (
+        <View style={{flex: 1}}>
+          <View
+            style={{
+              flex: 1,
+              bottom: -5,
+              borderBottomColor: 'black',
+              borderBottomWidth: StyleSheet.hairlineWidth,
+            }}
+          />
+          <Text style={styles.textsmall}>
+            {'\n'}
+            {' ApiRTC version is :' + apiRTC.version}
+            {'\n'}
+          </Text>
         </View>
       );
     }
@@ -619,8 +706,9 @@ export default class ReactNativeApiRTC extends React.Component {
 
     function screenCaptureInfoStop(ctx) {
       if (
-        ctx.state.status !== 'onCall' ||
-        ctx.state.screenDisableUserValidated === true
+        //ctx.state.status !== 'onCall' ||
+        //ctx.state.screenDisableUserValidated === true
+        ctx.state.displayScreenInfoStop === false
       ) {
         return null;
       }
@@ -883,7 +971,10 @@ export default class ReactNativeApiRTC extends React.Component {
       <View style={styles.container}>
         {screenCapturePickerView(this)}
         {menuOptionRemote(this)}
+        {renderApiRTCCnx(this)}
+        {renderWelcomeText(this)}
         {renderPicker(this)}
+        {renderFooter(this)}
         {renderRemoteViews(this)}
         {renderButtons(this)}
         {renderDialog(this)}

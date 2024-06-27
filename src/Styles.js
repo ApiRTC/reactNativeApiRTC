@@ -61,9 +61,10 @@ const styles = StyleSheet.create({
     //backgroundColor: '#d1d1d1',
   },
   input: {
-    width: '80%',
+    width: '60%',
     borderWidth: 1,
-    marginBottom: 20,
+    marginBottom: 5,
+    marginLeft: 10,
   },
   main: {
     width: '100%',
