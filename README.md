@@ -65,30 +65,39 @@ Then you can open [apiRTC Conference demo](https://apirtc.github.io/ApiRTC-examp
 
 For Android, edit your AndroidManifest.xml file by adding :
 ```
-<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-<uses-permission android:name="android.permission.BLUETOOTH" />
-<uses-permission android:name="android.permission.CAMERA" />
-<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-<uses-permission android:name="android.permission.RECORD_AUDIO" />
-<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-<uses-permission android:name="android.permission.VIBRATE" />
-<uses-permission android:name="android.permission.WAKE_LOCK" />
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-<!-- Screen sharing -->
-<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- Screen sharing -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 ```
 
 For iOS, edit your Info.plist file by adding :
 ```
-<key>NSCameraUsageDescription</key>
-<string>Camera permission description</string>
-<key>NSLocalNetworkUsageDescription</key>
-<string>Local network travel.</string>
-<key>NSMicrophoneUsageDescription</key>
-<string>Microphone permission description</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Camera permission description</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Microphone permission description</string>
+
+	<key>RTCScreenSharingExtension</key>
+	<string>org.reactjs.native.example.reactNativeApiRTC.screenSharing-Extension</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+		<string>fetch</string>
+		<string>processing</string>
+		<string>remote-notification</string>
+		<string>voip</string>
+	</array>
 ```
 
 ### Android SDK
@@ -112,3 +121,8 @@ echo $ANDROID_HOME //To check modifications
 Our application includes the possibility to share screen on iOS.
 Several steps are needed to add this feature on your application : 
 Here is [the documentation](Docs/add_screenSharing_on_iOS.md) to help you in this task.
+
+
+### Which node version was used for tutorial testings
+
+NodeJs version 20.5.1 . (Check [NVM](https://github.com/nvm-sh/nvm) if you need to have several nodeJs version)

@@ -1,3 +1,12 @@
+
+
+## [1.0.2](https://github.com/ApiRTC/reactNativeApiRTC/releases/tag/1.0.1) (2024-07-18)
+### Dependencies
+- apiRTC : 5.0.21 (Upgrade)
+
+### Bug Fixes
+- Improvement on conference leave
+
 ## [1.0.1](https://github.com/ApiRTC/reactNativeApiRTC/releases/tag/1.0.1) (2024-06-26)
 
 ### Dependencies

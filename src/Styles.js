@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     elevation: 20,
     position: 'absolute',
     width: '100%',
-    height: '7%',
+    height: '10%',
     bottom: '20%',
     display: 'flex',
     justifyContent: 'center',

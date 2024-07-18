@@ -58,6 +58,11 @@ import Switch_camera from '../assets/svg/Switch_camera.js';
 import Camera_record from '../assets/svg/Camera_record.js';
 //import Torche from '../assets/svg/LightBulb.js';
 
+//Ignore all log notifications:
+//You can hide JavaScript console logs by calling LogBox.ignoreAllLogs() before rendering your app.
+//import {LogBox} from 'react-native';
+//LogBox.ignoreAllLogs();
+
 const initialState = {
   initStatus: 'Registration ongoing',
   info: '',
@@ -166,11 +171,11 @@ export default class ReactNativeApiRTC extends React.Component {
   }
 
   joinConversation() {
-    this.setState({status: 'onCall'});
     this.conversation
       .join()
       .then(() => {
         console.info('Conversation join');
+        this.setState({status: 'onCall'});
         this.setState({initStatus: 'Conversation join'});
         apiRTC.Stream.createStreamFromUserMedia()
           .then(localStream => {
@@ -280,14 +285,8 @@ export default class ReactNativeApiRTC extends React.Component {
   call = () => {
     //on video call
     if (this.connectedSession) {
-      this.ua.enableMeshRoomMode(true); //Activate Mesh room mode
-
       this.conversation = this.connectedSession.getOrCreateConversation(
         this.state.roomName,
-        {
-          meshModeEnabled: false,
-          meshOnlyEnabled: false,
-        },
       );
       this.setConversationListeners();
       this.joinConversation();
@@ -320,16 +319,26 @@ export default class ReactNativeApiRTC extends React.Component {
       this.localScreen = null;
     }
 
-    this.conversation.leave().then(() => {
-      this.setState({
-        selfScreenSrc: null,
-        selfViewSrc: null,
-        status: 'pickConv',
-        remoteListSrc: new Map(),
-        connectedUsersList: [],
+    this.conversation
+      .leave()
+      .then(() => {
+        this.cleanConversationContext();
+      })
+      .catch(err => {
+        console.error('Error on leave conversation :', err);
+        this.cleanConversationContext();
       });
-      this.conversation = null;
+  };
+
+  cleanConversationContext = () => {
+    this.setState({
+      selfScreenSrc: null,
+      status: 'pickConv',
+      remoteListSrc: new Map(),
+      connectedUsersList: [],
     });
+    this.conversation.destroy();
+    this.conversation = null;
   };
 
   stopScreenSharingProcess = () => {
@@ -339,7 +348,11 @@ export default class ReactNativeApiRTC extends React.Component {
     }
     this.setState({selfScreenSrc: null});
     this.setState({displayScreenInfoStop: true});
-    if (this.localScreen && this.localScreenIsPublished) {
+    if (
+      this.localScreen &&
+      this.localScreen !== null &&
+      this.localScreenIsPublished
+    ) {
       this.conversation.unpublish(this.localScreen);
       this.localScreenIsPublished = false;
     }

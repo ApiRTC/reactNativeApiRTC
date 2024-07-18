@@ -1,6 +1,6 @@
 {
   "name": "reactNativeApiRTC",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -10,7 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@apirtc/react-native-apirtc": "5.0.16-react-native",
+    "@apirtc/react-native-apirtc": "5.0.21-react-native",
     "@config-plugins/react-native-webrtc": "^7.0.0",
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
