@@ -3,7 +3,7 @@
 
 Please note that screen sharing needs iOS 14+
 
-This fetaure is also using react-native-webrtc: https://github.com/react-native-webrtc/react-native-webrtc
+This feature is also using react-native-webrtc: https://github.com/react-native-webrtc/react-native-webrtc
 and is based on this sample: https://jitsi.github.io/handbook/docs/dev-guide/dev-guide-ios-sdk/#screen-sharing-integration
 
 We are using the iOS Broadcast Upload Extension for capturing the contents of the user's screen.
