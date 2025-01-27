@@ -61,7 +61,7 @@ Then you can open [apiRTC Conference demo](https://apirtc.github.io/ApiRTC-examp
 ### Restrictions
 * iOS screenSharing : screenSharing stream cannot be displayed locally on the application on iOS
 
-### What are the authorizations that are need to be declared on application
+### What are the authorizations that are needed to be declared on application
 
 For Android, edit your AndroidManifest.xml file by adding :
 ```
@@ -79,6 +79,9 @@ For Android, edit your AndroidManifest.xml file by adding :
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!-- Screen sharing -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
 ```
 
 For iOS, edit your Info.plist file by adding :
@@ -108,7 +111,7 @@ Sample for mac :
 nano ~/.bash_profile
 add following lines in bash_profile file:
 
-    export ANDROID_HOME=/Users/fred/Library/Android/sdk/
+    export ANDROID_HOME=/Users/YOUR_USER/Library/Android/sdk/  //Path to your Android SDK
 
     export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
 
@@ -116,12 +119,26 @@ source ~/.bash_profile //To apply modifications
 
 echo $ANDROID_HOME //To check modifications
 
+### Android Screensharing
+
+Android screenSharing service need to be enabled.
+You have to add the following code very early in your application, in your main activity's onCreate for instance:
+```
+    // Initialize the WebRTC module options.
+    WebRTCModuleOptions options = WebRTCModuleOptions.getInstance();
+    options.enableMediaProjectionService = true;
+```
+
+At the begining of your MainApplication.java file, import the module with :
+```
+    import com.oney.WebRTCModule.WebRTCModuleOptions;
+```
+
 ### iOS Screensharing
 
 Our application includes the possibility to share screen on iOS.
 Several steps are needed to add this feature on your application : 
 Here is [the documentation](Docs/add_screenSharing_on_iOS.md) to help you in this task.
-
 
 ### Which node version was used for tutorial testings
 

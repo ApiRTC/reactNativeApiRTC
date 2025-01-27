@@ -9,6 +9,7 @@ import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
 import java.util.List;
+import com.oney.WebRTCModule.WebRTCModuleOptions;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -51,6 +52,11 @@ public class MainApplication extends Application implements ReactApplication {
 
   @Override
   public void onCreate() {
+
+    // Initialize the WebRTC module options.
+    WebRTCModuleOptions options = WebRTCModuleOptions.getInstance();
+    options.enableMediaProjectionService = true;
+
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
     if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
