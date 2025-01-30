@@ -252,7 +252,6 @@ export default class ReactNativeApiRTC extends React.Component {
           .catch(err => {
             console.error('Error on subscribe to stream :', err);
           });
-        this.conversation.subscribeToStream(streamInfo.streamId);
       }
     });
 
@@ -355,6 +354,9 @@ export default class ReactNativeApiRTC extends React.Component {
     ) {
       this.conversation.unpublish(this.localScreen);
       this.localScreenIsPublished = false;
+    }
+    if (Platform.OS === 'android') {
+      this.localScreen.release();
     }
     this.localScreen = null;
     this.screenSharingIsStarted = false;
