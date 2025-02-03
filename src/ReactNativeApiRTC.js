@@ -32,7 +32,6 @@ import DeviceInfo from 'react-native-device-info';
 
 import '@apirtc/react-native-apirtc';
 
-import ForegroundService from './ForegroundService';
 import Chat_apiRTC from './Chat_apiRTC';
 import ReactNativeApiRTC_RPK from './ReactNativeApiRTC_RPK'; //This is to manage interaction with screen sharing extension on iOS
 
@@ -103,9 +102,6 @@ export default class ReactNativeApiRTC extends React.Component {
     this.localStream = null;
     this.localScreen = null;
     this.chatChild = null;
-    if (Platform.OS === 'android') {
-      this.foreground = new ForegroundService();
-    }
     this.screenSharingIsStarted = false; //Boolean to know if screen sharing is started
     this.localStreamIsPublished = false; //Boolean to know if local stream is published
     this.localScreenIsPublished = false; //Boolean to know if local screen is published
@@ -342,9 +338,6 @@ export default class ReactNativeApiRTC extends React.Component {
 
   stopScreenSharingProcess = () => {
     //Stop screen sharing
-    if (Platform.OS === 'android') {
-      this.foreground.stopService();
-    }
     this.setState({selfScreenSrc: null});
     this.setState({displayScreenInfoStop: true});
     if (
@@ -424,10 +417,6 @@ export default class ReactNativeApiRTC extends React.Component {
             console.error(err);
           });
       } else {
-        this.foreground.startService(
-          'Screen sharing',
-          'is capturing your screen',
-        );
         const displayMediaStreamConstraints = {
           video: true,
           audio: false,

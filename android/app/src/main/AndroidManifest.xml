@@ -24,10 +24,6 @@
       android:allowBackup="true"
       android:theme="@style/AppTheme"
       android:usesCleartextTraffic="true">
-      <service android:name="com.voximplant.foregroundservice.VIForegroundService" />
-      <service
-        android:name="app.notifee.core.ForegroundService"
-        android:foregroundServiceType="mediaProjection|camera|microphone" />
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"
