@@ -69,7 +69,7 @@ In our demo, in [Info.plist](https://github.com/ApiRTC/reactNativeApiRTC/blob/ma
 	<string>group.apirtc.reactNativeApiRTC.broadcast</string>
 ```
 
-Also Edit appGroupIdentifier value with your application group value in [SampleUploader.swift](https://github.com/ApiRTC/reactNativeApiRTC/blob/main/ios/screenSharing_Extension/SampleUploader.swift), 
+Also Edit appGroupIdentifier value with your application group value in [SampleHandler.swift](https://github.com/ApiRTC/reactNativeApiRTC/blob/main/ios/screenSharing_Extension/SampleHandler.swift), 
 ```
     private enum Constants {
         // the App Group ID value that the app and the broadcast extension targets are setup with. It differs for each app.
