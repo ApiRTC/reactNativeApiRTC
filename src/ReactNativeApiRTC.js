@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 /* globals apiRTC*/
 
-import React, {createRef}  from 'react';
+import React, {createRef} from 'react';
 import {
   Text,
   View,
@@ -15,7 +15,10 @@ import {
   NativeModules,
   Image,
   StyleSheet,
+  NativeEventEmitter,
 } from 'react-native';
+
+const {AppLifecycleModule} = NativeModules;
 
 import {
   //RTCPeerConnection,
@@ -110,6 +113,30 @@ export default class ReactNativeApiRTC extends React.Component {
   componentDidMount() {
     //apiRTC.setLogLevel(10);
 
+    //Process to handle app destroy event
+    //This will be called when the app is destroyed (when the user closes the app)
+    //This is done by the AppLifecycleModule which is a native module that listens to app lifecycle events
+    //and sends an event to the JavaScript side when the app is destroyed
+    //This is useful to stop screen sharing (and extension) if it is started
+
+    if (Platform.OS === 'android') {
+      const eventEmitter = new NativeEventEmitter();
+      eventEmitter.addListener('liveCycleEvent', event => {
+        console.debug('liveCycleEvent :', event.eventType);
+        if (event.eventType === 'onDestroy') {
+          //App destroy event received from AppLifecycleModule
+
+          //Note : This event is not always received when the app is closed
+          //liveCycleEvent Module will also call mediaStreamRelease on WebRTCModule
+          //to release the local stream and the screen sharing stream
+          //But we also call hangUp() here to try unpublish the streams
+          this.hangUp();
+        } else {
+          console.debug('liveCycleEvent not managed :', event.eventType);
+        }
+      });
+    }
+
     this.setState({remoteListSrc: new Map(), remoteList: new Map()});
 
     this.ua = new apiRTC.UserAgent({
@@ -177,6 +204,27 @@ export default class ReactNativeApiRTC extends React.Component {
           .then(localStream => {
             this.localStream = localStream;
             console.info('Update local stream');
+
+            console.debug('localStream created :', this.localStream);
+            console.debug(
+              'localStream._reactTag :',
+              this.localStream.data._reactTag,
+            );
+            console.debug(
+              'localStream._tracks[0].id :',
+              this.localStream.data._tracks[0].id,
+            );
+
+            //Sending localStream data to AppLifecycleModule
+            //This is to enable AppLifecycleModule to stop screen sharing extension when the app is destroyed
+            let paramForAppLifecycleModule = {
+              localStreamReactTag: this.localStream.data._reactTag,
+              localStreamTrackId: this.localStream.data._tracks[0].id,
+            };
+            AppLifecycleModule.sendInfoToAppLifecycleModule(
+              paramForAppLifecycleModule,
+            );
+
             this.conversation
               .publish(localStream)
               .then(pubStream => {
@@ -302,6 +350,17 @@ export default class ReactNativeApiRTC extends React.Component {
       this.localStream = null;
     }
 
+    if (Platform.OS === 'android') {
+      //ReInit localStream data in AppLifecycleModule
+      let paramForAppLifecycleModule = {
+        localStreamReactTag: 'STOPPED',
+        localStreamTrackId: 'STOPPED',
+      };
+      AppLifecycleModule.sendInfoToAppLifecycleModule(
+        paramForAppLifecycleModule,
+      );
+    }
+
     //Stop screen sharing
     if (Platform.OS === 'ios') {
       //Sending stop screen sharing request to the extension
@@ -350,6 +409,15 @@ export default class ReactNativeApiRTC extends React.Component {
     }
     if (Platform.OS === 'android') {
       this.localScreen.release();
+
+      //ReInit localScreen data in AppLifecycleModule
+      let paramForAppLifecycleModule = {
+        localScreenReactTag: 'STOPPED',
+        localScreenTrackId: 'STOPPED',
+      };
+      AppLifecycleModule.sendInfoToAppLifecycleModule(
+        paramForAppLifecycleModule,
+      );
     }
     this.localScreen = null;
     this.screenSharingIsStarted = false;
@@ -417,6 +485,7 @@ export default class ReactNativeApiRTC extends React.Component {
             console.error(err);
           });
       } else {
+        //Android : create screen sharing stream
         const displayMediaStreamConstraints = {
           video: true,
           audio: false,
@@ -425,6 +494,27 @@ export default class ReactNativeApiRTC extends React.Component {
           .then(localScreenShare => {
             this.screenSharingIsStarted = true;
             this.localScreen = localScreenShare;
+
+            console.debug('localScreen created :', this.localScreen);
+            console.debug(
+              'localScreen._reactTag :',
+              this.localScreen.data._reactTag,
+            );
+            console.debug(
+              'localScreen._reactTag :',
+              this.localScreen.data._tracks[0].id,
+            );
+
+            //Sending localScreen data to AppLifecycleModule
+            //This is to enable AppLifecycleModule to stop screen sharing extension when the app is destroyed
+            let paramForAppLifecycleModule = {
+              localScreenReactTag: this.localScreen.data._reactTag,
+              localScreenTrackId: this.localScreen.data._tracks[0].id,
+            };
+            AppLifecycleModule.sendInfoToAppLifecycleModule(
+              paramForAppLifecycleModule,
+            );
+
             this.setState({selfScreenSrc: this.localScreen.getData().toURL()});
             this.conversation
               .publish(localScreenShare)

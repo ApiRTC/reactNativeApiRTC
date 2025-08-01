@@ -142,3 +142,9 @@ Here is [the documentation](Docs/add_screenSharing_on_iOS.md) to help you in thi
 ### Which node version was used for tutorial testings
 
 NodeJs version 20.5.1 . (Check [NVM](https://github.com/nvm-sh/nvm) if you need to have several nodeJs version)
+
+
+### Manage application kill by user
+
+A native module AppLifecycleModule is added in our application to manage the case where the user kill the application using swipe.
+This module detect the onHostDestroy event to stop the screenSharing extension and unpublish stream.
