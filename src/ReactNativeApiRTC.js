@@ -215,15 +215,17 @@ export default class ReactNativeApiRTC extends React.Component {
               this.localStream.data._tracks[0].id,
             );
 
-            //Sending localStream data to AppLifecycleModule
-            //This is to enable AppLifecycleModule to stop screen sharing extension when the app is destroyed
-            let paramForAppLifecycleModule = {
-              localStreamReactTag: this.localStream.data._reactTag,
-              localStreamTrackId: this.localStream.data._tracks[0].id,
-            };
-            AppLifecycleModule.sendInfoToAppLifecycleModule(
-              paramForAppLifecycleModule,
-            );
+            if (Platform.OS === 'android') {
+              //Sending localStream data to AppLifecycleModule
+              //This is to enable AppLifecycleModule to stop screen sharing extension when the app is destroyed
+              let paramForAppLifecycleModule = {
+                localStreamReactTag: this.localStream.data._reactTag,
+                localStreamTrackId: this.localStream.data._tracks[0].id,
+              };
+              AppLifecycleModule.sendInfoToAppLifecycleModule(
+                paramForAppLifecycleModule,
+              );
+            }
 
             this.conversation
               .publish(localStream)
