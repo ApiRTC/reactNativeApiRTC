@@ -10,7 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@apirtc/react-native-apirtc": "5.0.21-react-native",
+    "@apirtc/react-native-apirtc": "^5.0.30-react-native",
     "@config-plugins/react-native-webrtc": "^7.0.0",
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
