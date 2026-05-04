@@ -10,8 +10,8 @@
     "test": "jest"
   },
   "dependencies": {
-    "@apirtc/react-native-apirtc": "^5.0.30-react-native",
-    "@config-plugins/react-native-webrtc": "^7.0.0",
+    "@apirtc/react-native-apirtc": "^5.0.35",
+    "@config-plugins/react-native-webrtc": "^14.0.0",
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@fortawesome/react-native-fontawesome": "^0.3.2",
@@ -21,7 +21,7 @@
     "react-native": "0.72.4",
     "react-native-device-info": "^10.9.0",
     "react-native-svg": "^13.13.0",
-    "react-native-webrtc": "124.0.4",
+    "react-native-webrtc": "^124.0.7",
     "socket.io-client": "^4.7.5"
   },
   "devDependencies": {
