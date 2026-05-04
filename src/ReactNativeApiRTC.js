@@ -19,6 +19,7 @@ import {
 } from 'react-native';
 
 const {AppLifecycleModule} = NativeModules;
+const {BackgroundBlurModule} = NativeModules;
 
 import {
   //RTCPeerConnection,
@@ -58,6 +59,8 @@ import Hangup from '../assets/svg/Hangup.js';
 import Menu from '../assets/svg/Menu.js';
 import Switch_camera from '../assets/svg/Switch_camera.js';
 import Camera_record from '../assets/svg/Camera_record.js';
+import Blur_on from '../assets/svg/Blur_on.js';
+import Blur_off from '../assets/svg/Blur_off.js';
 //import Torche from '../assets/svg/LightBulb.js';
 
 //Ignore all log notifications:
@@ -80,6 +83,7 @@ const initialState = {
   roomName: 'defaultRoom',
   mute: false, // --| Use for mute state and switch state
   muteVideo: false, // --|
+  blur: false, // --| Use for background blur state (Android only)
   chatOpen: false,
   displayScreenInfoStop: false,
   menuOpen: false,
@@ -342,7 +346,54 @@ export default class ReactNativeApiRTC extends React.Component {
     }
   };
 
+  toggleBlur = async () => {
+    if (Platform.OS !== 'android') {
+      console.warn('Background blur is only supported on Android');
+      return;
+    }
+
+    if (!this.localStream) {
+      console.warn('No local stream available for blur');
+      return;
+    }
+
+    try {
+      if (this.state.blur === false) {
+        console.info('Enabling background blur');
+        const videoTrack = this.localStream.data._tracks.find(t => t.kind === 'video');
+        if (!videoTrack) {
+          console.error('toggleBlur: no video track found in local stream');
+          return;
+        }
+        const config = {
+          streamReactTag: this.localStream.data._reactTag,
+          trackId: videoTrack.id,
+        };
+        console.info('Blur config:', JSON.stringify(config));
+        await BackgroundBlurModule.enableBlur(config);
+        this.setState({blur: true});
+        console.info('Background blur enabled');
+      } else {
+        console.info('Disabling background blur');
+        await BackgroundBlurModule.disableBlur();
+        this.setState({blur: false});
+        console.info('Background blur disabled');
+      }
+    } catch (err) {
+      console.error('Error toggling blur:', err);
+    }
+  };
+
   hangUp = () => {
+    if (this.state.blur && Platform.OS === 'android') {
+      try {
+        BackgroundBlurModule.disableBlur();
+      } catch (e) {
+        console.warn('Error disabling blur during hangUp:', e);
+      }
+      this.setState({blur: false});
+    }
+
     if (this.localStream && this.localStreamIsPublished) {
       this.conversation.unpublish(this.localStream);
       this.localStreamIsPublished = false;
@@ -894,6 +945,7 @@ export default class ReactNativeApiRTC extends React.Component {
             <View style={styles.svgButton}>{renderMuteVideoButton(ctx)}</View>
           </TouchableOpacity>
           {displayScreenShare(ctx)}
+          {displayBlurButton(ctx)}
           <TouchableOpacity
             style={styles.renderButtonComponent}
             onPress={() => {
@@ -947,6 +999,31 @@ export default class ReactNativeApiRTC extends React.Component {
         return <ScreenShare_on />;
       }
       return <ScreenShare_off />;
+    }
+
+    function renderBlurButton(ctx) {
+      if (ctx.state.blur) {
+        return <Blur_on />;
+      }
+      return <Blur_off />;
+    }
+
+    function displayBlurButton(ctx) {
+      if (Platform.OS !== 'android') {
+        return null;
+      }
+      return (
+        <TouchableOpacity
+          style={[
+            styles.renderButtonComponent,
+            ctx.state.blur ? {backgroundColor: '#0080FF'} : {},
+          ]}
+          onPress={() => {
+            ctx.toggleBlur();
+          }}>
+          <View style={styles.svgButton}>{renderBlurButton(ctx)}</View>
+        </TouchableOpacity>
+      );
     }
 
     function chat(ctx) {
