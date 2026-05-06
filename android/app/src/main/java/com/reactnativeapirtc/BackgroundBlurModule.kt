@@ -36,6 +36,7 @@ class BackgroundBlurModule(reactContext: ReactApplicationContext) :
     }
 
     private var processor: BlurVideoProcessor? = null
+    private var imageProcessor: BackgroundImageProcessor? = null
     private var videoSource: VideoSource? = null
 
     override fun getName(): String = NAME
@@ -77,7 +78,12 @@ class BackgroundBlurModule(reactContext: ReactApplicationContext) :
                 processor?.disable()
             }
 
-            val proc = BlurVideoProcessor(reactApplicationContext)
+            val strong = try { config.getBoolean("strong") } catch (_: Exception) { false }
+            val proc = BlurVideoProcessor(
+                reactApplicationContext,
+                blurRadius = if (strong) 25f else 20f,
+                blurPasses = if (strong) 3 else 1,
+            )
             proc.enable()
             try {
                 source.setVideoProcessor(proc)
@@ -111,22 +117,112 @@ class BackgroundBlurModule(reactContext: ReactApplicationContext) :
             videoSource?.setVideoProcessor(null)
             processor?.disable()
             processor = null
+            imageProcessor?.disable()
+            imageProcessor = null
             videoSource = null
 
-            Log.d(TAG, "Background blur disabled successfully")
+            Log.d(TAG, "Video effect disabled successfully")
             promise.resolve(true)
         } catch (e: Exception) {
-            Log.e(TAG, "Error disabling blur", e)
-            promise.reject("BLUR_ERROR", "Failed to disable blur: ${e.message}", e)
+            Log.e(TAG, "Error disabling video effect", e)
+            promise.reject("BLUR_ERROR", "Failed to disable effect: ${e.message}", e)
         }
     }
 
     /**
-     * Check if blur is currently enabled.
+     * Enable background image replacement on the local video stream.
+     * Downloads the image from imageUrl synchronously on the native modules thread.
+     */
+    @ReactMethod
+    fun enableBackgroundImage(config: ReadableMap, promise: Promise) {
+        try {
+            val trackId = readConfigString(config, "trackId")
+            val imageUrl = readConfigString(config, "imageUrl")
+            Log.d(TAG, "enableBackgroundImage called, trackId=$trackId")
+
+            if (trackId.isEmpty()) {
+                promise.reject("INVALID_ARGS", "trackId is required")
+                return
+            }
+            if (imageUrl.isEmpty()) {
+                promise.reject("INVALID_ARGS", "imageUrl is required")
+                return
+            }
+
+            val webRTCModule = reactApplicationContext.getNativeModule(WebRTCModule::class.java)
+            if (webRTCModule == null) {
+                promise.reject("NO_WEBRTC", "WebRTCModule not found")
+                return
+            }
+
+            val source = findVideoSource(webRTCModule, trackId)
+            if (source == null) {
+                promise.reject("NO_SOURCE", "VideoSource not found for trackId=$trackId")
+                return
+            }
+
+            val bitmap = downloadBitmap(imageUrl)
+            if (bitmap == null) {
+                promise.reject("DOWNLOAD_ERROR", "Failed to download image from $imageUrl")
+                return
+            }
+
+            // Disable any active effect first
+            videoSource?.setVideoProcessor(null)
+            processor?.disable()
+            processor = null
+            imageProcessor?.disable()
+            imageProcessor = null
+
+            val proc = BackgroundImageProcessor(bitmap)
+            proc.enable()
+            try {
+                source.setVideoProcessor(proc)
+            } catch (e: Exception) {
+                proc.disable()
+                promise.reject("SOURCE_ERROR", "Failed to attach processor: ${e.message}", e)
+                return
+            }
+
+            imageProcessor = proc
+            videoSource = source
+
+            Log.d(TAG, "Background image enabled successfully")
+            promise.resolve(true)
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Error enabling background image", e)
+            promise.reject("IMAGE_BG_ERROR", "Failed to enable background image: ${e.message}", e)
+        }
+    }
+
+    /**
+     * Check if any video effect (blur or background image) is currently active.
      */
     @ReactMethod
     fun isBlurEnabled(promise: Promise) {
-        promise.resolve(processor != null)
+        promise.resolve(processor != null || imageProcessor != null)
+    }
+
+    /**
+     * Download a Bitmap from a URL synchronously (safe on the native modules background thread).
+     */
+    private fun downloadBitmap(url: String): android.graphics.Bitmap? {
+        return try {
+            Log.d(TAG, "Downloading background image: $url")
+            val connection = java.net.URL(url).openConnection() as java.net.HttpURLConnection
+            connection.connectTimeout = 10_000
+            connection.readTimeout = 15_000
+            connection.doInput = true
+            connection.connect()
+            val bitmap = android.graphics.BitmapFactory.decodeStream(connection.inputStream)
+            connection.disconnect()
+            Log.d(TAG, "Downloaded: ${bitmap?.width}x${bitmap?.height}")
+            bitmap
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to download image from $url", e)
+            null
+        }
     }
 
     // =====================================================================
@@ -317,6 +413,8 @@ class BackgroundBlurModule(reactContext: ReactApplicationContext) :
         videoSource?.setVideoProcessor(null)
         processor?.disable()
         processor = null
+        imageProcessor?.disable()
+        imageProcessor = null
         videoSource = null
     }
 }

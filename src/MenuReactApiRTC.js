@@ -1,12 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 
-//import React, {Component} from 'react';
 import React from 'react';
 import {
   StyleSheet,
   Text,
   View,
-  Pressable,
+  TouchableOpacity,
+  Image,
   StatusBar,
   Platform,
 } from 'react-native';
@@ -19,41 +19,62 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     height: '100%',
-    backgroundColor: 'white',
+    backgroundColor: '#1D1F20',
   },
-  picker: {},
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  input: {
-    width: '80%',
-    borderWidth: 1,
-    padding: 5,
-    marginBottom: 20,
-  },
-  button: {
+  inner: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
-    marginVertical: 10,
     paddingHorizontal: 32,
-    borderRadius: 4,
-    backgroundColor: '#1E90FF',
   },
-  text: {
+  logo: {
+    width: 160,
+    height: 48,
+    marginBottom: 32,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#e8eaed',
+    textAlign: 'center',
+    marginBottom: 8,
+    paddingHorizontal: 16,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#c0cad5',
+    textAlign: 'center',
+    marginBottom: 40,
+    paddingHorizontal: 16,
+  },
+  button: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#0080FF',
+    borderRadius: 12,
+    justifyContent: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: '700',
     fontSize: 16,
-    lineHeight: 21,
-    fontWeight: 'bold',
-    letterSpacing: 0.25,
-    color: 'white',
+    textAlign: 'center',
+    width: '100%',
+    paddingHorizontal: 8,
+  },
+  versionText: {
+    position: 'absolute',
+    bottom: 20,
+    left: 0,
+    right: 0,
+    textAlign: 'center',
+    fontSize: 12,
+    color: '#8898a8',
   },
 });
 
 const initialState = {
   confMode: false,
-  peerMode: false,
 };
 
 export default class MenuReactApiRTC extends React.Component {
@@ -76,33 +97,27 @@ export default class MenuReactApiRTC extends React.Component {
   }
 
   render() {
-    function conference(ctx) {
-      if (ctx.state.confMode !== true) {
-        return null;
-      }
+    if (this.state.confMode) {
       return <ReactNativeApiRTC />;
-    }
-
-    function menu(ctx) {
-      if (ctx.state.confMode === true) {
-        return null;
-      }
-      return (
-        <View style={{marginTop: 250, paddingHorizontal: 100}}>
-          <Text>Welcome, select the demo :</Text>
-          <Pressable
-            style={styles.button}
-            onPress={() => ctx.changeMode('confMode', true)}>
-            <Text style={styles.text}>Tuto : ApiRTC Conversation</Text>
-          </Pressable>
-        </View>
-      );
     }
 
     return (
       <View style={styles.container}>
-        {menu(this)}
-        {conference(this)}
+        <View style={styles.inner}>
+          <Image
+            source={{uri: 'https://apirtc.com/images/apiRTC-dark-e1540196351855.webp'}}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={styles.title}>{' Welcome '}</Text>
+          <Text style={styles.subtitle}>{'Select a demo to get started '}</Text>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => this.changeMode('confMode', true)}>
+            <Text style={styles.buttonText}>{'ApiRTC Conversation '}</Text>
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.versionText}>ApiRTC Demo</Text>
       </View>
     );
   }

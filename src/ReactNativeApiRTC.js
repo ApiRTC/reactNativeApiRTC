@@ -5,7 +5,6 @@ import React, {createRef} from 'react';
 import {
   Text,
   View,
-  Button,
   TextInput,
   ScrollView,
   Pressable,
@@ -36,6 +35,8 @@ import DeviceInfo from 'react-native-device-info';
 
 import '@apirtc/react-native-apirtc';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import Chat_apiRTC from './Chat_apiRTC';
 import ReactNativeApiRTC_RPK from './ReactNativeApiRTC_RPK'; //This is to manage interaction with screen sharing extension on iOS
 
@@ -46,7 +47,6 @@ import ReactNativeApiRTC_RPK from './ReactNativeApiRTC_RPK'; //This is to manage
 //import MovingViewWithPanResponder from './panSelfView';
 import Svg_bubble_speech from '../assets/svg/Bubble-speech.js';
 import {styles} from './Styles';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 
 /* Import SVG */
 import Microphone_on from '../assets/svg/Microphone_on.js';
@@ -60,8 +60,47 @@ import Menu from '../assets/svg/Menu.js';
 import Switch_camera from '../assets/svg/Switch_camera.js';
 import Camera_record from '../assets/svg/Camera_record.js';
 import Blur_on from '../assets/svg/Blur_on.js';
-import Blur_off from '../assets/svg/Blur_off.js';
+import Chevron_up from '../assets/svg/Chevron_up.js';
 //import Torche from '../assets/svg/LightBulb.js';
+
+const BACKGROUNDS = [
+  {id: 'none', label: 'Aucun', type: 'none', thumbUri: null},
+  {id: 'blur', label: 'Flou', type: 'blur', strong: false, thumbUri: null},
+  {
+    id: 'blur-strong',
+    label: 'Flou+',
+    type: 'blur',
+    strong: true,
+    thumbUri: null,
+  },
+  {
+    id: 'beach',
+    label: 'Plage',
+    type: 'image',
+    imageUrl:
+      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1280',
+    thumbUri:
+      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=120&q=60',
+  },
+  {
+    id: 'mountains',
+    label: 'Montagne',
+    type: 'image',
+    imageUrl:
+      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1280',
+    thumbUri:
+      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=120&q=60',
+  },
+  {
+    id: 'office',
+    label: 'Bureau',
+    type: 'image',
+    imageUrl:
+      'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1280',
+    thumbUri:
+      'https://images.unsplash.com/photo-1497366216548-37526070297c?w=120&q=60',
+  },
+];
 
 //Ignore all log notifications:
 //You can hide JavaScript console logs by calling LogBox.ignoreAllLogs() before rendering your app.
@@ -83,7 +122,9 @@ const initialState = {
   roomName: 'defaultRoom',
   mute: false, // --| Use for mute state and switch state
   muteVideo: false, // --|
-  blur: false, // --| Use for background blur state (Android only)
+  selectedBgEffect: 'none', // 'none' | 'blur' | image bg id — Android only
+  videoEffectPanel: false, // whether the video effect panel is open
+  isApplyingBg: false, // download/apply in progress
   chatOpen: false,
   displayScreenInfoStop: false,
   menuOpen: false,
@@ -139,6 +180,16 @@ export default class ReactNativeApiRTC extends React.Component {
           console.debug('liveCycleEvent not managed :', event.eventType);
         }
       });
+    }
+
+    if (Platform.OS === 'android') {
+      AsyncStorage.getItem('videoEffect')
+        .then(saved => {
+          if (saved && saved !== 'none') {
+            this.setState({selectedBgEffect: saved});
+          }
+        })
+        .catch(() => {});
     }
 
     this.setState({remoteListSrc: new Map(), remoteList: new Map()});
@@ -208,6 +259,9 @@ export default class ReactNativeApiRTC extends React.Component {
           .then(localStream => {
             this.localStream = localStream;
             console.info('Update local stream');
+            if (Platform.OS === 'android') {
+              this.restoreVideoEffect();
+            }
 
             console.debug('localStream created :', this.localStream);
             console.debug(
@@ -346,56 +400,120 @@ export default class ReactNativeApiRTC extends React.Component {
     }
   };
 
-  toggleBlur = async () => {
-    if (Platform.OS !== 'android') {
-      console.warn('Background blur is only supported on Android');
+  toggleVideoEffectPanel = () => {
+    this.setState(prev => ({videoEffectPanel: !prev.videoEffectPanel}));
+  };
+
+  saveVideoEffectPreference = effectId => {
+    AsyncStorage.setItem('videoEffect', effectId).catch(() => {});
+  };
+
+  restoreVideoEffect = async () => {
+    const effectId = this.state.selectedBgEffect;
+    if (effectId === 'none' || !this.localStream) {
       return;
     }
-
-    if (!this.localStream) {
-      console.warn('No local stream available for blur');
+    const bg = BACKGROUNDS.find(b => b.id === effectId);
+    if (!bg || bg.type === 'none') {
       return;
     }
-
     try {
-      if (this.state.blur === false) {
-        console.info('Enabling background blur');
-        const videoTrack = this.localStream.data._tracks.find(t => t.kind === 'video');
-        if (!videoTrack) {
-          console.error('toggleBlur: no video track found in local stream');
-          return;
-        }
-        const config = {
+      const videoTrack = this.localStream.data._tracks.find(
+        t => t.kind === 'video',
+      );
+      if (!videoTrack) {
+        return;
+      }
+      if (bg.type === 'blur') {
+        await BackgroundBlurModule.enableBlur({
           streamReactTag: this.localStream.data._reactTag,
           trackId: videoTrack.id,
-        };
-        console.info('Blur config:', JSON.stringify(config));
-        await BackgroundBlurModule.enableBlur(config);
-        this.setState({blur: true});
-        console.info('Background blur enabled');
-      } else {
-        console.info('Disabling background blur');
-        await BackgroundBlurModule.disableBlur();
-        this.setState({blur: false});
-        console.info('Background blur disabled');
+          strong: bg.strong === true,
+        });
+      } else if (bg.type === 'image') {
+        await BackgroundBlurModule.enableBackgroundImage({
+          streamReactTag: this.localStream.data._reactTag,
+          trackId: videoTrack.id,
+          imageUrl: bg.imageUrl,
+        });
       }
     } catch (err) {
-      console.error('Error toggling blur:', err);
+      console.error('Error restoring video effect:', err);
+    }
+  };
+
+  applyVideoEffect = async bg => {
+    if (Platform.OS !== 'android') {
+      return;
+    }
+    if (this.state.isApplyingBg) {
+      return;
+    }
+
+    // Save preference and update UI immediately (works even before joining)
+    this.saveVideoEffectPreference(bg.id);
+    this.setState({selectedBgEffect: bg.id});
+
+    if (!this.localStream) {
+      // No active stream — preference saved, close panel
+      this.setState({videoEffectPanel: false});
+      return;
+    }
+
+    this.setState({isApplyingBg: true});
+
+    try {
+      if (bg.type === 'none') {
+        await BackgroundBlurModule.disableBlur();
+      } else if (bg.type === 'blur') {
+        const videoTrack = this.localStream.data._tracks.find(
+          t => t.kind === 'video',
+        );
+        if (!videoTrack) {
+          console.error('applyVideoEffect: no video track found');
+          return;
+        }
+        await BackgroundBlurModule.enableBlur({
+          streamReactTag: this.localStream.data._reactTag,
+          trackId: videoTrack.id,
+          strong: bg.strong === true,
+        });
+      } else if (bg.type === 'image') {
+        const videoTrack = this.localStream.data._tracks.find(
+          t => t.kind === 'video',
+        );
+        if (!videoTrack) {
+          console.error('applyVideoEffect: no video track found');
+          return;
+        }
+        await BackgroundBlurModule.enableBackgroundImage({
+          streamReactTag: this.localStream.data._reactTag,
+          trackId: videoTrack.id,
+          imageUrl: bg.imageUrl,
+        });
+      }
+    } catch (err) {
+      console.error('Error applying video effect:', err);
+    } finally {
+      this.setState({isApplyingBg: false, videoEffectPanel: false});
     }
   };
 
   hangUp = () => {
-    if (this.state.blur && Platform.OS === 'android') {
+    if (this.state.selectedBgEffect !== 'none' && Platform.OS === 'android') {
       try {
         BackgroundBlurModule.disableBlur();
       } catch (e) {
-        console.warn('Error disabling blur during hangUp:', e);
+        console.warn('Error disabling video effect during hangUp:', e);
       }
-      this.setState({blur: false});
+      // Keep selectedBgEffect in state — will be auto-applied on next join
+      this.setState({videoEffectPanel: false});
     }
 
     if (this.localStream && this.localStreamIsPublished) {
-      this.conversation.unpublish(this.localStream);
+      if (this.conversation) {
+        this.conversation.unpublish(this.localStream);
+      }
       this.localStreamIsPublished = false;
     }
     if (this.localStream) {
@@ -426,15 +544,17 @@ export default class ReactNativeApiRTC extends React.Component {
       this.localScreen = null;
     }
 
-    this.conversation
-      .leave()
-      .then(() => {
-        this.cleanConversationContext();
-      })
-      .catch(err => {
-        console.error('Error on leave conversation :', err);
-        this.cleanConversationContext();
-      });
+    if (this.conversation) {
+      this.conversation
+        .leave()
+        .then(() => {
+          this.cleanConversationContext();
+        })
+        .catch(err => {
+          console.error('Error on leave conversation :', err);
+          this.cleanConversationContext();
+        });
+    }
   };
 
   cleanConversationContext = () => {
@@ -727,28 +847,29 @@ export default class ReactNativeApiRTC extends React.Component {
     }
 
     function renderApiRTCCnx(ctx) {
-      if (ctx.state.connected === 'connected') {
-        return (
-          <Text>
-            {' ApiRTC connection status :'}
-            <FontAwesomeIcon icon="cloud" color={'green'} />
-          </Text>
-        );
-      } else if (ctx.state.connected === 'reconnecting') {
-        return (
-          <Text>
-            {' ApiRTC connection status :'}
-            <FontAwesomeIcon icon="cloud" color={'orange'} />
-          </Text>
-        );
-      } else {
-        return (
-          <Text>
-            {' ApiRTC connection status :'}
-            <FontAwesomeIcon icon="cloud" color={'red'} />
-          </Text>
-        );
+      if (ctx.state.status !== 'pickConv') {
+        return null;
       }
+      const isConnected = ctx.state.connected === 'connected';
+      const isReconnecting = ctx.state.connected === 'reconnecting';
+      const dotColor = isConnected
+        ? '#34a853'
+        : isReconnecting
+        ? '#fbbc04'
+        : '#ea4335';
+      const label = isConnected
+        ? 'Connected '
+        : isReconnecting
+        ? 'Reconnecting… '
+        : 'Disconnected ';
+      return (
+        <View style={styles.cnxBadgeOuter}>
+          <View style={styles.cnxBadge}>
+            <View style={[styles.cnxDot, {backgroundColor: dotColor}]} />
+          </View>
+          <Text style={styles.cnxLabel}>{label}</Text>
+        </View>
+      );
     }
 
     function renderWelcomeText(ctx) {
@@ -756,12 +877,16 @@ export default class ReactNativeApiRTC extends React.Component {
         return null;
       }
       return (
-        <View style={{paddingHorizontal: 20, marginTop: 150}}>
-          <Text>
-            {'Welcome on reactNativeApiRTC Conference demo :'}
-            {'\n'}
-            {'\n'}
-          </Text>
+        <View style={styles.welcomeBlock}>
+          <Text style={styles.welcomeTitle}>Conference Demo</Text>
+          <Text style={styles.welcomeSubtitle}>Powered by ApiRTC</Text>
+          <Image
+            source={{
+              uri: 'https://apirtc.com/images/apiRTC-dark-e1540196351855.webp',
+            }}
+            style={styles.apiRtcLogo}
+            resizeMode="contain"
+          />
         </View>
       );
     }
@@ -771,18 +896,16 @@ export default class ReactNativeApiRTC extends React.Component {
         return null;
       }
       return (
-        <View style={{flexDirection: 'row'}}>
+        <View style={styles.joinRow}>
           <TextInput
             onChangeText={val => setRoom(ctx, val)}
-            style={styles.input}
-            placeholder={' Enter your Conference name'}
+            style={styles.joinInput}
+            placeholder="Conference name"
+            placeholderTextColor="#8a9bb0"
           />
-          <Button
-            onPress={ctx.call}
-            title="Join Conference"
-            color="#0080FF"
-            accessibilityLabel="Join Conference"
-          />
+          <TouchableOpacity style={styles.joinBtn} onPress={ctx.call}>
+            <Text style={styles.joinBtnText}>Join</Text>
+          </TouchableOpacity>
         </View>
       );
     }
@@ -792,21 +915,7 @@ export default class ReactNativeApiRTC extends React.Component {
         return null;
       }
       return (
-        <View style={{flex: 1}}>
-          <View
-            style={{
-              flex: 1,
-              bottom: -5,
-              borderBottomColor: 'black',
-              borderBottomWidth: StyleSheet.hairlineWidth,
-            }}
-          />
-          <Text style={styles.textsmall}>
-            {'\n'}
-            {' ApiRTC version is :' + apiRTC.version}
-            {'\n'}
-          </Text>
-        </View>
+        <Text style={styles.versionText}>{'ApiRTC ' + apiRTC.version}</Text>
       );
     }
 
@@ -824,6 +933,7 @@ export default class ReactNativeApiRTC extends React.Component {
         <RTCView
           style={styles.selfViewLocal}
           streamURL={ctx.state.selfViewSrc}
+          zOrder={1}
         />
       );
     }
@@ -878,33 +988,51 @@ export default class ReactNativeApiRTC extends React.Component {
       if (ctx.state.status !== 'onCall') {
         return null;
       }
+      const count = ctx.state.remoteListSrc.size;
+      if (count === 0) {
+        return <View style={styles.remoteContainer} />;
+      }
+      const streams = Array.from(ctx.state.remoteListSrc.values());
+      // 1-2 streams : column, each tile flex:1
+      // 3+ streams  : row wrap, each tile 50% width, scrollable
+      if (count <= 2) {
+        return (
+          <View style={[styles.remoteContainer, {flexDirection: 'column'}]}>
+            {streams.map((value, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.remoteViewHalf}
+                onLongPress={evt => ctx.menuOptionRemote(index, value, evt)}>
+                <RTCView
+                  streamURL={value}
+                  style={{width: '100%', height: '100%'}}
+                  objectFit="cover"
+                  zOrder={0}
+                />
+              </TouchableOpacity>
+            ))}
+          </View>
+        );
+      }
       return (
         <View style={styles.remoteContainer}>
-          <ScrollView style={[styles.scollView, {flexGrow: 1}]}>
+          <ScrollView style={styles.scollView}>
             <View style={styles.remoteContainerFlex}>
-              {renderRemoteView(ctx)}
+              {streams.map((value, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.remoteViewGrid}
+                  onLongPress={evt => ctx.menuOptionRemote(index, value, evt)}>
+                  <RTCView
+                    streamURL={value}
+                    style={{width: '100%', height: '100%'}}
+                    objectFit="cover"
+                  />
+                </TouchableOpacity>
+              ))}
             </View>
           </ScrollView>
         </View>
-      );
-    }
-
-    function renderRemoteView(ctx) {
-      if (ctx.state.remoteListSrc.size === 0) {
-        return null;
-      }
-      return Array.from(ctx.state.remoteListSrc.values()).map(
-        (value, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.remoteView}
-            onLongPress={evt => ctx.menuOptionRemote(index, value, evt)}>
-            <RTCView
-              streamURL={value}
-              style={{width: '100%', height: '100%'}}
-            />
-          </TouchableOpacity>
-        ),
       );
     }
 
@@ -937,15 +1065,31 @@ export default class ReactNativeApiRTC extends React.Component {
             }}>
             <View style={styles.svgButton}>{renderMuteButton(ctx)}</View>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.renderButtonComponent}
-            onPress={() => {
-              ctx.muteVideo();
-            }}>
-            <View style={styles.svgButton}>{renderMuteVideoButton(ctx)}</View>
-          </TouchableOpacity>
+          <View style={styles.ctrlGroup}>
+            <TouchableOpacity
+              style={[
+                styles.renderButtonComponent,
+                Platform.OS === 'android' && styles.ctrlGroupVideoBtn,
+              ]}
+              onPress={() => {
+                ctx.muteVideo();
+              }}>
+              <View style={styles.svgButton}>{renderMuteVideoButton(ctx)}</View>
+            </TouchableOpacity>
+            {Platform.OS === 'android' && (
+              <TouchableOpacity
+                style={[
+                  styles.chevronBtn,
+                  ctx.state.videoEffectPanel && styles.chevronBtnOpen,
+                ]}
+                onPress={() => ctx.toggleVideoEffectPanel()}>
+                <View style={styles.svgButton}>
+                  <Chevron_up />
+                </View>
+              </TouchableOpacity>
+            )}
+          </View>
           {displayScreenShare(ctx)}
-          {displayBlurButton(ctx)}
           <TouchableOpacity
             style={styles.renderButtonComponent}
             onPress={() => {
@@ -1001,28 +1145,63 @@ export default class ReactNativeApiRTC extends React.Component {
       return <ScreenShare_off />;
     }
 
-    function renderBlurButton(ctx) {
-      if (ctx.state.blur) {
-        return <Blur_on />;
+    function renderVideoEffectPanel(ctx) {
+      if (Platform.OS !== 'android' || ctx.state.status !== 'onCall') {
+        return null;
       }
-      return <Blur_off />;
-    }
-
-    function displayBlurButton(ctx) {
-      if (Platform.OS !== 'android') {
+      if (!ctx.state.videoEffectPanel) {
         return null;
       }
       return (
-        <TouchableOpacity
-          style={[
-            styles.renderButtonComponent,
-            ctx.state.blur ? {backgroundColor: '#0080FF'} : {},
-          ]}
-          onPress={() => {
-            ctx.toggleBlur();
-          }}>
-          <View style={styles.svgButton}>{renderBlurButton(ctx)}</View>
-        </TouchableOpacity>
+        <>
+          <TouchableOpacity
+            style={styles.panelOverlay}
+            activeOpacity={1}
+            onPress={() => ctx.setState({videoEffectPanel: false})}
+          />
+          <View style={styles.videoEffectPanel}>
+            <Text style={styles.panelTitle}>Arrière-plan vidéo</Text>
+            <View style={styles.bgOptionsGrid}>
+              {BACKGROUNDS.map(bg => (
+                <TouchableOpacity
+                  key={bg.id}
+                  style={[
+                    styles.bgOption,
+                    ctx.state.selectedBgEffect === bg.id &&
+                      styles.bgOptionActive,
+                  ]}
+                  onPress={() => ctx.applyVideoEffect(bg)}
+                  disabled={ctx.state.isApplyingBg}>
+                  {bg.id === 'none' && (
+                    <Text style={styles.bgOptionNoneText}>✕</Text>
+                  )}
+                  {bg.type === 'blur' && (
+                    <View style={{width: 32, height: 32}}>
+                      <Blur_on />
+                    </View>
+                  )}
+                  {bg.thumbUri && (
+                    <Image
+                      source={{uri: bg.thumbUri}}
+                      style={StyleSheet.absoluteFill}
+                      resizeMode="cover"
+                    />
+                  )}
+                  <Text
+                    style={[
+                      styles.bgOptionLabel,
+                      bg.thumbUri ? styles.bgOptionLabelOverlay : null,
+                    ]}>
+                    {bg.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            {ctx.state.isApplyingBg && (
+              <Text style={styles.bgApplyingText}>Application…</Text>
+            )}
+          </View>
+        </>
       );
     }
 
@@ -1144,12 +1323,13 @@ export default class ReactNativeApiRTC extends React.Component {
       <View style={styles.container}>
         {screenCapturePickerView(this)}
         {menuOptionRemote(this)}
-        {renderApiRTCCnx(this)}
         {renderWelcomeText(this)}
+        {renderApiRTCCnx(this)}
         {renderPicker(this)}
         {renderFooter(this)}
         {renderRemoteViews(this)}
         {renderButtons(this)}
+        {renderVideoEffectPanel(this)}
         {renderDialog(this)}
         {renderSelfView(this)}
         {renderScreenSelfView(this)}
